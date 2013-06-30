@@ -86,6 +86,14 @@
       </address>
     </author>
 
+    <author fullname="Pranoop Ersani"
+            surname="Ersani">
+      <organization abbrev="NetApp">NetApp</organization>
+      <address>
+        <email>Pranoop.Erasani@netapp.com</email>
+      </address>
+    </author>
+
     <author fullname="Peter Honeyman"
             surname="Honeyman">
       <address>
@@ -147,15 +155,15 @@
 
     <section title="Introduction and Motivation">
       <t>
+	<!-- XXX edited for phrasing -->
 	The NFSv4.1 specification describes pNFS <xref
-	target="NFSv4.1"/>. In NFSv4.1, parallel access is limited
-	to the data contents of regular files:  the content of regular
-	files is distributed (striped) across multiple storage
-	devices.  Metadata is not distributed or striped: the model
-	presented in the NFSv4.1 specification is that of a single
-	metadata server.  This document describes a means to add
-	metadata striping to pNFS, which includes the notion of
-	multiple metadata servers.
+	target="NFSv4.1"/>.  pNFS distributes (stripes) file data across
+	multiple storage devices.  In NFSv4.1, parallel access is limited to
+	the data contents of regular files.  Metadata is not distributed or
+	striped: the model presented in the NFSv4.1 specification is that of a
+	single metadata server.  This document describes a means to add
+	metadata striping to pNFS, which includes the notion of multiple
+	metadata servers.
       </t>
 
       <t>
@@ -199,7 +207,7 @@
 					   Model">
 	<t>
 	  <xref target="METASTRIPE"/> defines two different methods
-	  for encoding metadata server locations, only the ?simple?
+	  for encoding metadata server locations, only the "simple"
 	  model uses the pNFS device mechanism.  For this draft, we
 	  propose a single model based on pNFS devices, in which there
 	  is a one-to-one mapping between devices and L-MDS servers.
