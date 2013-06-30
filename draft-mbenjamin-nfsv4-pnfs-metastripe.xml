@@ -137,7 +137,7 @@
 	based on prior drafts by Eisler, M., with some departures.
 	The current draft attempts to define a somewhat lighter-weight
 	protocol, in particular, seeks to permit striping for
-	?filehandle only? operations such as LOCK and OPEN + CLAIM_FH,
+	"filehandle only" operations such as LOCK and OPEN + CLAIM_FH,
 	without clients having to obtain metadata layouts on regular
 	files.  We gratefully acknowledge the primary contributions of
 	Mike Eisler, Pranoop Ersani, and others.
@@ -260,7 +260,7 @@
 						   (uint32_t)">
 	  <t>
 	    The meta_stripe_count attribute represents, for directory
-	    objects, the directory?s current stripe count, which may
+	    objects, the directory's current stripe count, which may
 	    help the client decide if it will request a dentry striping
 	    layout on the directory.  This attribute MAY be offered only
 	    to clients which hold an inode striping layout on the
@@ -268,6 +268,9 @@
 	  </t>
 	</section>
       </section>
+
+      <!-- XXX Add remark on CREATE with type NFS4REG -->
+
       <section anchor="PREADDIR" title="PREADDIR (Operation)">
 	<t>
 	  The NFSv4.1 READDIR operation has insufficient information
@@ -694,7 +697,7 @@
 Let F be the function specified in mdln_namebased_alg;
 
 Let X = (x1, x2, x3, ...) some set of inputs for  function F, such
-that x1 SHOULD be the component name of the file, and x2, x3, ? any
+that x1 SHOULD be the component name of the file, and x2, x3, ... any
 additional parameters required for the chosen F, their arguments
 asserted to be values available to the client.
 
@@ -740,7 +743,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
             </figure>
 	    <t>
 	      That is, for each logical stripe in the directory, the
-	      client notes stripe number (merely the stripe?s offset
+	      client notes stripe number (merely the stripe's offset
 	      in the sequence), and derives from it the corresponding
 	      index into mdln_devicelist by indirection on
 	      mdln_stripe_pattern.  The object at
