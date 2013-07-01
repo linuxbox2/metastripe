@@ -98,13 +98,13 @@ Table of Contents
        5.3.1.  Layout Hint  . . . . . . . . . . . . . . . . . . . . .  9
        5.3.2.  Devices  . . . . . . . . . . . . . . . . . . . . . . .  9
        5.3.3.  Metadata Layout  . . . . . . . . . . . . . . . . . . . 10
-       5.3.4.  Layoutupdate4 lou_body . . . . . . . . . . . . . . . . 10
+       5.3.4.  Layoutupdate4 lou_body . . . . . . . . . . . . . . . . 11
      5.4.  Metadata Layout Semantics  . . . . . . . . . . . . . . . . 11
        5.4.1.  LAYOUTGET Argument Conventions . . . . . . . . . . . . 11
        5.4.2.  Inode Striping Layouts . . . . . . . . . . . . . . . . 11
-         5.4.2.1.  Inode Stripe Hints . . . . . . . . . . . . . . . . 11
+         5.4.2.1.  Inode Stripe Hints . . . . . . . . . . . . . . . . 12
        5.4.3.  Dentry Striping Layouts  . . . . . . . . . . . . . . . 12
-         5.4.3.1.  L-MDS Selection for Name-based Operations  . . . . 12
+         5.4.3.1.  L-MDS Selection for Name-based Operations  . . . . 13
 
 
 
@@ -118,29 +118,29 @@ Internet-Draft               pNFS Metastripe                   July 2013
    6.  Further Considerations . . . . . . . . . . . . . . . . . . . . 15
      6.1.  Storage Access Protocols . . . . . . . . . . . . . . . . . 15
      6.2.  Revocation of Layouts  . . . . . . . . . . . . . . . . . . 15
-     6.3.  Stateids . . . . . . . . . . . . . . . . . . . . . . . . . 16
+     6.3.  Stateids . . . . . . . . . . . . . . . . . . . . . . . . . 15
      6.4.  Lease Terms  . . . . . . . . . . . . . . . . . . . . . . . 16
-     6.5.  Layout Operations Sent to an L-MDS . . . . . . . . . . . . 17
-     6.6.  Filehandles in Metadata Layouts  . . . . . . . . . . . . . 17
+     6.5.  Layout Operations Sent to an L-MDS . . . . . . . . . . . . 16
+     6.6.  Filehandles in Metadata Layouts  . . . . . . . . . . . . . 16
      6.7.  Restriping . . . . . . . . . . . . . . . . . . . . . . . . 17
        6.7.1.  Layout Recall Cases  . . . . . . . . . . . . . . . . . 17
-       6.7.2.  Hint Invalidation  . . . . . . . . . . . . . . . . . . 18
-     6.8.  Recovery . . . . . . . . . . . . . . . . . . . . . . . . . 18
-     6.9.  Failure and Restart of Client  . . . . . . . . . . . . . . 18
-     6.10. Failure and Restart of Server  . . . . . . . . . . . . . . 18
+       6.7.2.  Hint Invalidation  . . . . . . . . . . . . . . . . . . 17
+     6.8.  Recovery . . . . . . . . . . . . . . . . . . . . . . . . . 17
+     6.9.  Failure and Restart of Client  . . . . . . . . . . . . . . 17
+     6.10. Failure and Restart of Server  . . . . . . . . . . . . . . 17
    7.  Negotiation  . . . . . . . . . . . . . . . . . . . . . . . . . 18
    8.  Usage Examples . . . . . . . . . . . . . . . . . . . . . . . . 18
      8.1.  open-lock-write-close  . . . . . . . . . . . . . . . . . . 18
      8.2.  parallel create-layoutcommit . . . . . . . . . . . . . . . 19
-     8.3.  parallel directory listing . . . . . . . . . . . . . . . . 20
-   9.  Operational Recommendation for Deployment  . . . . . . . . . . 20
+     8.3.  parallel directory listing . . . . . . . . . . . . . . . . 19
+   9.  Operational Recommendation for Deployment  . . . . . . . . . . 19
    10. Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 20
    11. Security Considerations  . . . . . . . . . . . . . . . . . . . 20
-   12. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 21
+   12. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 20
    13. References . . . . . . . . . . . . . . . . . . . . . . . . . . 21
      13.1. Normative References . . . . . . . . . . . . . . . . . . . 21
-     13.2. Informative References . . . . . . . . . . . . . . . . . . 22
-   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 22
+     13.2. Informative References . . . . . . . . . . . . . . . . . . 21
+   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 21
 
 
 
@@ -541,18 +541,18 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
                                  Figure 3
 
-5.3.4.  Layoutupdate4 lou_body
 
-      ///  %/*
-      ///  % * LAYOUT4_METADATA.
-      ///  % * Encoded in the lou_body field of type layoutupdate4:
-      ///  % *    Nothing. lou_body is a zero length array of octets.
-      ///  % */
-      ///  %
 
-                                 Figure 4
 
-   The LAYOUT4_METADATA layout type has no content for lou_body member
+
+
+
+
+
+
+
+
+
 
 
 
@@ -561,7 +561,31 @@ Benjamin, et al.         Expires January 2, 2014               [Page 10]
 Internet-Draft               pNFS Metastripe                   July 2013
 
 
-   of the layoutupdate4 data type.
+5.3.4.  Layoutupdate4 lou_body
+
+///
+///  struct md_dentry_layoutupdate4 {
+///      int32_t mdlu_entries_added;
+///      int32_t mdlu_entries_removed;
+///      nfstime4 mdlu_last_update;
+///  };
+///
+///  % /*
+///  %  * Encoded in the lou_body field of data type
+///  %  * layoutupdate4:
+///  %  */
+///  struct md_layout_update4 {
+///      union md_layout_type switch (enum md_layout_subtype4 subtype) {
+///             case LAYOUTMETA4_INODE:
+///                     void;
+///             case LAYOUTMETA4_DENTRY:
+///                     md_layoutupdate4 mlu_dentry;
+///     };
+///  };
+
+   layoutupdate4 lou_body
+
+                                 Figure 4
 
 5.4.  Metadata Layout Semantics
 
@@ -585,6 +609,14 @@ Internet-Draft               pNFS Metastripe                   July 2013
    As noted in Section 4, the scope of inode striping layouts is an
    entire file system.  The client can acquire the (singleton) inode
    striping layout for a given file system using any corresponding file
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 11]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
    handle which it happens to hold, and whose object the client is
    permitted to access.  For example, the client could use the file
    handle of the first directory it traverses on a given file system,
@@ -609,14 +641,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    At all events, when a client holds an inode stripe hint for a file
    object, it uses the GETDEVICEINFO operation to map the hint value to
    a to a device address of data type md_layout_addr4 in the ordinary
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 11]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
    pNFS manner.
 
    The server ensures that each such device remains accessible
@@ -641,6 +665,14 @@ Internet-Draft               pNFS Metastripe                   July 2013
    in the stripe pattern is an index into the device list.
 
    To perform a name based operation, the client maps the name to a
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 12]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
    number with the name based algorithm, looks that number up in the
    stripe pattern (modulo the length of the stripe pattern), yielding a
    device id that may be interpreted with GETDEVICEINFO, in the ordinary
@@ -654,24 +686,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    supplied in field mdln_namebased_alg of the layout content to compute
    a preferred L-MDS to use when performing name-based operations, as
    follows:
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 12]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
 
 Let F be the function specified in mdln_namebased_alg;
 
@@ -705,6 +719,16 @@ Let deviceid = mdl_layout.mdln_devicelist[idx];
    algorithm to perform enumeration of striped directories preferred
    metadata servers, in parallel:
 
+
+
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 13]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
    For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
            do
                    Let stripe =
@@ -721,14 +745,6 @@ Let deviceid = mdl_layout.mdln_devicelist[idx];
    derives from it the corresponding index into mdln_devicelist by
    indirection on mdln_stripe_pattern.  The object at
    mdln_devicelist[stripe_number] is a device id, which the client maps
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 13]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
    to an L-MDS using GETDEVICEINFO, and performs a sequence of PREADDIR
    operations on that server.  The PREADDIR operation behaves exactly as
    described in section 18.23.3 of [NFSv4.1], but takes in addition to
@@ -761,22 +777,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    For metastripe layouts of subtype LAYOUTMETA4_DENTRY, the layout
    specific data for LAYOUTCOMMIT contains the signed count of items
    added to and removed from the directory since the last LAYOUTCOMMIT
-   operation.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -785,29 +785,7 @@ Benjamin, et al.         Expires January 2, 2014               [Page 14]
 Internet-Draft               pNFS Metastripe                   July 2013
 
 
-///
-///  struct md_dentry_layoutupdate4 {
-///      int32_t mdlu_entries_added;
-///      int32_t mdlu_entries_removed;
-///      nfstime4 mdlu_last_update;
-///  };
-///
-///  % /*
-///  %  * Encoded in the lou_body field of data type
-///  %  * layoutupdate4:
-///  %  */
-///  struct md_layout_update4 {
-///      union md_layout_type switch (enum md_layout_subtype4 subtype) {
-///             case LAYOUTMETA4_INODE:
-///                     void;
-///             case LAYOUTMETA4_DENTRY:
-///                     md_layoutupdate4 mlu_dentry;
-///     };
-///  };
-
-   layoutupdate4 lou_body
-
-                                 Figure 7
+   operation.
 
 
 6.  Further Considerations
@@ -833,14 +811,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    layout of type LAYOUT4_METADATA, the set of operations that can
    return NFS4ERR_PNFS_NO_LAYOUT is: ACCESS, CLOSE, COMMIT, CREATE,
    DELEGRETURN, GETATTR, LINK, LOCK, LOCKT, LOCKU, LOOKUP, LOOKUPP,
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 15]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
    NVERIFY, OPEN, OPENATTR, OPEN_DOWNGRADE, PREADDIR, READ, READDIR,
    READLINK, REMOVE, RENAME, SECINFO, SETATTR, VERIFY, WRITE,
    GET_DIR_DELEGATION, SECINFO, SECINFO_NO_NAME, and WANT_DELEGATION.
@@ -863,6 +833,14 @@ Internet-Draft               pNFS Metastripe                   July 2013
    a metadata layout that directed the client to the L-MDS.
 
    In some cases, one L-MDS MUST be aware of a stateid generated by
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 15]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
    another L-MDS.  For example a client can obtain a stateid from the
    L-MDS serving as the destination of name-based operations, which
    includes OPEN.  However, operations that use the stateid will be
@@ -885,17 +863,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    as the result of a metadata layout.  The client has a lease for each
    client ID it has with an I-MDS or L-MDS, and each lease MUST be
    renewed separately for each client ID.
-
-
-
-
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 16]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
 
 6.5.  Layout Operations Sent to an L-MDS
 
@@ -922,6 +889,14 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
    Metadata layouts do not present filehandles.
 
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 16]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
 6.7.  Restriping
 
 6.7.1.  Layout Recall Cases
@@ -944,14 +919,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    under the auspices of a metadata layout which is no longer valid, the
    L-MDS is not required to perform it.  The L-MDS SHOULD fail the
    operation with NFS4ERR_PNFS_NO_LAYOUT.
-
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 17]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
 
 6.7.2.  Hint Invalidation
 
@@ -976,6 +943,16 @@ Internet-Draft               pNFS Metastripe                   July 2013
    TBD
 
 
+
+
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 17]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
 7.  Negotiation
 
    The NFSv4.x client sends a GETATTR operation for attribute
@@ -990,6 +967,29 @@ Internet-Draft               pNFS Metastripe                   July 2013
    This section contains illustrative examples of the protocol.
 
 8.1.  open-lock-write-close
+
+             I-MDS: LAYOUTGET for inode layout -> ino_stateid
+             I-MDS: OPEN('foo') -> open_stateid
+             I-MDS: GETATTR(meta_stripe_deviceid) -> in_deviceid
+             I-MDS: GETDEVICEINFO(in_deviceid) -> [L-MDS]
+
+             L-MDS: LOCK(open_stateid) -> lock_stateid
+             L-MDS: WRITE(lock_stateid)
+             I-MDS: CLOSE(open_stateid)
+             I-MDS: LAYOUTRETURN(dn_stateid)
+             I-MDS: LAYOUTRETURN(ino_stateid)
+
+                                 Figure 7
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1008,19 +1008,6 @@ Benjamin, et al.         Expires January 2, 2014               [Page 18]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
-
-             I-MDS: LAYOUTGET for inode layout -> ino_stateid
-             I-MDS: OPEN('foo') -> open_stateid
-             I-MDS: GETATTR(meta_stripe_deviceid) -> in_deviceid
-             I-MDS: GETDEVICEINFO(in_deviceid) -> [L-MDS]
-
-             L-MDS: LOCK(open_stateid) -> lock_stateid
-             L-MDS: WRITE(lock_stateid)
-             I-MDS: CLOSE(open_stateid)
-             I-MDS: LAYOUTRETURN(dn_stateid)
-             I-MDS: LAYOUTRETURN(ino_stateid)
-
-                                 Figure 8
 
 8.2.  parallel create-layoutcommit
 
@@ -1043,27 +1030,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
              I-MDS: LAYOUTRETURN(dn_stateid)
              I-MDS: LAYOUTRETURN(ino_stateid)
 
-                                 Figure 9
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 19]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
+                                 Figure 8
 
 8.3.  parallel directory listing
 
@@ -1083,13 +1050,21 @@ Internet-Draft               pNFS Metastripe                   July 2013
              I-MDS: LAYOUTRETURN(dn_stateid)
              I-MDS: LAYOUTRETURN(ino_stateid)
 
-                                 Figure 10
+                                 Figure 9
 
 
 9.  Operational Recommendation for Deployment
 
    Deploy the metadata striping layout when it is anticipated that the
    workload will involve a high fraction of non-I/O operations on
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 19]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
    filehandles.
 
 
@@ -1111,14 +1086,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    server and client are, respectively, a complete NFSv4.1 server and
    client, and so the security considerations of [NFSv4.1] apply to any
    client or server using the metadata layout type.
-
-
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 20]
-
-Internet-Draft               pNFS Metastripe                   July 2013
 
 
 12.  IANA Considerations
@@ -1146,6 +1113,14 @@ Internet-Draft               pNFS Metastripe                   July 2013
    This specification introduces two new recommended attributes
    (meta_stripe_deviceid and meta_stripe_count).
 
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 20]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
    This specification introduces a new operation (PREADDIR).
 
 
@@ -1169,14 +1144,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
 
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 21]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
    [RFC5226]  Narten, T. and H. Alvestrand, "Guidelines for Writing an
               IANA Considerations Section in RFCs", BCP 26, RFC 5226,
               May 2008.
@@ -1199,6 +1166,17 @@ Authors' Addresses
    Email: matt@cohortfs.com
 
 
+
+
+
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 21]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
    Casey Bodley
 
    Email: casey@cohortfs.com
@@ -1218,6 +1196,28 @@ Authors' Addresses
    Peter Honeyman
 
    Email: peter.honeyman@gmail.com
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
