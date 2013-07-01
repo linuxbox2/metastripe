@@ -1012,7 +1012,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
       </t>
     </section>
 
-    <section anchor="Usage Examples title="Usage Examples">
+    <section anchor="Usage Examples" title="Usage Examples">
       <t>
 	This section contains illustrative examples of the protocol.
       </t>

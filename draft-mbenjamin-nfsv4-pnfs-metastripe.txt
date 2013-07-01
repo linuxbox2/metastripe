@@ -129,16 +129,16 @@ Internet-Draft               pNFS Metastripe                   July 2013
      6.9.  Failure and Restart of Client  . . . . . . . . . . . . . . 18
      6.10. Failure and Restart of Server  . . . . . . . . . . . . . . 18
    7.  Negotiation  . . . . . . . . . . . . . . . . . . . . . . . . . 18
-   8.  Operational Recommendation for Deployment  . . . . . . . . . . 18
-   9.  Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 18
-   10. Security Considerations  . . . . . . . . . . . . . . . . . . . 19
-   11. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 19
-   12. References . . . . . . . . . . . . . . . . . . . . . . . . . . 19
-     12.1. Normative References . . . . . . . . . . . . . . . . . . . 19
-     12.2. Informative References . . . . . . . . . . . . . . . . . . 20
-   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 20
-
-
+   8.  Usage Examples . . . . . . . . . . . . . . . . . . . . . . . . 18
+     8.1.  Inode Striping 1 . . . . . . . . . . . . . . . . . . . . . 18
+   9.  Operational Recommendation for Deployment  . . . . . . . . . . 19
+   10. Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 19
+   11. Security Considerations  . . . . . . . . . . . . . . . . . . . 19
+   12. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 19
+   13. References . . . . . . . . . . . . . . . . . . . . . . . . . . 20
+     13.1. Normative References . . . . . . . . . . . . . . . . . . . 20
+     13.2. Informative References . . . . . . . . . . . . . . . . . . 21
+   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 21
 
 
 
@@ -285,7 +285,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
       Initial Metadata Server (I-MDS).  The I-MDS is the metadata server
       from which the client obtains a filehandle prior to acquiring any
-      layout on the file
+      layout on the file.
 
       Layout Metadata Server (L-MDS).  The L-MDS is the metadata server
       from which the client obtains a filehandle from after redirection
@@ -747,10 +747,10 @@ Internet-Draft               pNFS Metastripe                   July 2013
    are exactly as in ordinary NFSv4.1, except with respect to entry and
    cookie partitioning as described here.  The client SHOULD present to
    a component L-MDS only cookie values previously returned to that
-   client by that same L-MDS, or 0 to commence iteration.  An L-MDS that
-   is not also an I-MDS MAY reject with NFS4ERR_BADCOOKIE PREADDIR
-   operations using cookie values that are valid cookies for the logical
-   directory, but which are local to another L-MDS segment.
+   client by that same L-MDS, or 0 to commence iteration.  An L-MDS MAY
+   reject with NFS4ERR_BADCOOKIE PREADDIR operations using cookie values
+   that are valid cookies for the logical directory, but which are local
+   to another L-MDS segment.
 
 5.5.  LAYOUTCOMMIT
 
@@ -938,7 +938,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
    If the implementation wishes to perform inode restriping which would
    invalidate any inode stripe hint which it has issued to clients, it
    MUST successfully recall all controlling layouts of type
-   LAYOUTMETA4_INODE which would conflict with the restriping
+   LAYOUTMETA4_INODE which would conflict with the restriping.
 
    Naturally, if a client requests an L-MDS to perform any operation
    under the auspices of a metadata layout which is no longer valid, the
@@ -978,21 +978,62 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 7.  Negotiation
 
-   n pNFS client sends a GETATTR operation for attribute fs_layout_type.
-   If the reply contains the metadata layout type, then either or both
-   of inode or dentry striping are supported, subject to further
-   verification by subsequent LAYOUTGET operations.  If not, the client
-   cannot use metadata striping.
+   The NFSv4.x client sends a GETATTR operation for attribute
+   fs_layout_type.  If the reply contains the metadata layout type, then
+   either or both of inode or dentry striping are supported, subject to
+   further verification by subsequent LAYOUTGET operations.  If not, the
+   client cannot use metadata striping.
 
 
-8.  Operational Recommendation for Deployment
+8.  Usage Examples
+
+   This section contains illustrative examples of the protocol.
+
+8.1.  Inode Striping 1
+
+   A client which detects that it has crossed a file system boundary
+   (see RFC 5661) checks whether the new file system supports
+   LAYOUT4_METADATA, and having verified this in the affirmative, the
+   client requests a layout of type LAYOUT4_METADATA and subtype
+   LAYOUTMETA4_INODE, using any file handle in the new file system
+   (e.g., the handle it just encountered).  The server implememtation
+   grants the client an appropriate layout.  Call the server instance
+   the client happens to be talking to S.
+
+   In subsequent READDIR and GETATTR operations on the new file system,
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 18]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
+   the client requests the recommended, get-only meta_stripe_deviceid
+   attribute for a regular file F. The client keeps the returned value
+   of meta_stripe_deviceid with other, NFSv4-specific attribute
+   information (e.g., in an NFS vnode structure).
+
+   At some time later, an application client attempts to open F for
+   writing.  The client uses the GETDEVICEINFO operation to identify a
+   preferred address for operating on F. If the client has not already
+   negotiated an NFSv4.1 forward channel with the indicated server S2
+   (EXCHANGE_ID, CREATE_SESSION, etc), it does so, else it re-uses an
+   existing channel.  The client sends an OPEN request to S2, using the
+   filehandle it obtained previously from S1, obtaining a new open
+   stateid.  The client uses the new open stateid in subsequent READ,
+   WRITE, operations.  Eventually directed by the application to close
+   F, the client's interaction with F is completed.
+
+
+9.  Operational Recommendation for Deployment
 
    Deploy the metadata striping layout when it is anticipated that the
    workload will involve a high fraction of non-I/O operations on
    filehandles.
 
 
-9.  Acknowledgements
+10.  Acknowledgements
 
    We gratefully acknowledge the primary contributions of Mike Eisler,
    Pranoop Ersani, and others, in [METASTRIPE].
@@ -1003,13 +1044,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
    feedback.
 
 
-
-Benjamin, et al.         Expires January 2, 2014               [Page 18]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
-10.  Security Considerations
+11.  Security Considerations
 
    The security considerations of Section 13.12 of [NFSv4.1] which are
    specific to data servers apply to l-MDSes.  In addition, each l-MDS
@@ -1018,10 +1053,18 @@ Internet-Draft               pNFS Metastripe                   July 2013
    client or server using the metadata layout type.
 
 
-11.  IANA Considerations
+12.  IANA Considerations
 
    This specification requires an addition to the Layout Types registry
    described in Section 22.4 of [NFSv4.1].  The five fields added to the
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 19]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
    registy are:
 
    1.  Name of layout type: LAYOUT4_METADATA.
@@ -1046,9 +1089,9 @@ Internet-Draft               pNFS Metastripe                   July 2013
    This specification introduces a new operation (PREADDIR).
 
 
-12.  References
+13.  References
 
-12.1.  Normative References
+13.1.  Normative References
 
    [CITY]     Pike and Alakuijala, "Introducing CityHash", April 2011, <
               http://google-opensource.blogspot.com/2011/04/
@@ -1057,14 +1100,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    [METASTRIPE]
               Eisler, "Metadata Striping for pNFS", October 2010, <http:
               //tools.ietf.org/html/
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 19]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
               draft-eisler-nfsv4-pnfs-metastripe-02>.
 
    [NFSv4.1]  Shepler, Eisler, and Noveck, "Network File System (NFS)
@@ -1078,7 +1113,15 @@ Internet-Draft               pNFS Metastripe                   July 2013
               IANA Considerations Section in RFCs", BCP 26, RFC 5226,
               May 2008.
 
-12.2.  Informative References
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 20]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
+13.2.  Informative References
 
    [RFC4506]  Eisler, M., "XDR: External Data Representation Standard",
               STD 67, RFC 4506, May 2006.
@@ -1112,52 +1155,9 @@ Authors' Addresses
    Email: Pranoop.Erasani@netapp.com
 
 
-
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 20]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
    Peter Honeyman
 
    Email: peter.honeyman@gmail.com
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
