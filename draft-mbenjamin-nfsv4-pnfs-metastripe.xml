@@ -296,7 +296,7 @@
 	  <t>
 	    Initial Metadata Server (I-MDS).  The I-MDS is the
 	    metadata server from which the client obtains a filehandle
-	    prior to acquiring any layout on the file
+	    prior to acquiring any layout on the file.
 	  </t>
 	  <t>
 	    Layout Metadata Server (L-MDS).  The L-MDS is the metadata
@@ -970,7 +970,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	    which would invalidate any inode stripe hint which it has
 	    issued to clients, it MUST successfully recall all
 	    controlling layouts of type LAYOUTMETA4_INODE which would
-	    conflict with the restriping
+	    conflict with the restriping.
 	  </t>
 	  <t>
 	    Naturally, if a client requests an L-MDS to perform any
