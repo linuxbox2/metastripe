@@ -155,7 +155,6 @@
 
     <section title="Introduction and Motivation">
       <t>
-	<!-- XXX edited for phrasing -->
 	The NFSv4.1 specification describes pNFS <xref
 	target="NFSv4.1"/>.  pNFS distributes (stripes) file data across
 	multiple storage devices.  In NFSv4.1, parallel access is limited to
@@ -197,7 +196,6 @@
 	  <xref target="METASTRIPE"/> offers implementations the
 	  option to propagate layout filehandles for all metadata
 	  layout types.  Since it would be impossible to reasonably
-
 	  support this under the new proposed model for
 	  filehandle-only operations, we propose instead that L-MDS
 	  filehandles always be equivalent to I-MDS filehandles.
@@ -208,7 +206,7 @@
 	<t>
 	  <xref target="METASTRIPE"/> defines two different methods
 	  for encoding metadata server locations, only the "simple"
-	  model uses the pNFS device mechanism.  For this draft, we
+	  model uses the pNFS device mechanism.  In this draft, we
 	  propose a single model based on pNFS devices, in which there
 	  is a one-to-one mapping between devices and L-MDS servers.
 	  This approach facilitates sharing device addresses across
@@ -217,6 +215,7 @@
 	  metadata layout.
 	</t>
       </section>
+
       <section anchor="CookieModel" title="Cookie Model">
 	<t>
 	  NFSv4 associates with each entry in a directory a unique
@@ -233,6 +232,14 @@
 	  directory entry, is not defined.
 	</t>
       </section>
+
+      <section anchor="LayoutCommit" title="LAYOUTCOMMIT">
+	<t>
+	  In this draft, we introduce layout-subtype specific data
+	  for the LAYOUTCOMMIT operation.
+	</t>
+      </section>
+
       <section anchor="Attributes" title="Recommended Attributes">
 	<t>
 	  We propose two new recommended attributes.
@@ -564,6 +571,9 @@
 ///  };
 ]]></artwork>
           </figure>
+	  <t>
+	    <!-- XXX comments on mdl_flags etc -->
+	  </t>
 	</section>
 	<section anchor="DefLayoutupdate4" title="Layoutupdate4
 						  lou_body">
@@ -782,6 +792,44 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 
 	</section>
       </section>
+
+      <section anchor="LAYOUTCOMMIT" title="LAYOUTCOMMIT">
+	<t>
+	  As inode striping layouts are effectively read-only, the layout
+	  specific data for metastripe layouts of subtype LAYOUTMETA4_INODE
+	  is void.
+	</t>
+	<t>
+	  For metastripe layouts of subtype LAYOUTMETA4_DENTRY, the layout
+	  specific data for LAYOUTCOMMIT contains the signed count of items
+	  added to and removed from the directory since the last LAYOUTCOMMIT
+	  operation.
+	</t>
+	    <figure align="left" anchor="fig_dir_enum_alg">
+              <artwork><![CDATA[
+///
+///  struct md_dentry_layoutupdate4 {
+///      int32_t mdlu_entries_added;
+///      int32_t mdlu_entries_removed;
+///      nfstime4 mdlu_last_update;
+///  };
+///
+///  % /*
+///  %  * Encoded in the lou_body field of data type
+///  %  * layoutupdate4:
+///  %  */
+///  struct md_layout_update4 {
+///      union md_layout_type switch (enum md_layout_subtype4 subtype) {
+///             case LAYOUTMETA4_INODE:
+///                     void;
+///             case LAYOUTMETA4_DENTRY:
+///                     md_layoutupdate4 mlu_dentry;
+///     };
+///  };
+]]></artwork>
+              <postamble>layoutupdate4 lou_body</postamble>
+            </figure>
+      </section>
       
     </section>
 
@@ -821,10 +869,14 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
       <section anchor="FCStateids" title="Stateids">
 	<t>
 	  The pNFS specification for LAYOUT4_NFSV4_1_FILES states data
-	  servers MUST be aware of the stateids granted by MDS so that
-	  the stateids passed to READ and WRITE can be properly
-	  validated.  This requirement extends to the LAYOUT4_METADATA
-	  layout type: the L-MDS MUST be aware of any non-layout
+	  servers MUST be aware of the stateids granted by MDS so that the
+	  stateids passed to READ and WRITE can be properly validated.
+	  Similarly, in layouts of type LAYOUT4_METADATA, the L-MDS MUST be
+	  aware of layout stateids issued by the controlling I-MDS in the
+	  corresponding layout.
+	</t>
+	<t>
+	  In addition, the L-MDS MUST be aware of any non-layout
 	  stateids granted by the I-MDS, if and only if the client is
 	  in contact the L-MDS under direction of a metadata layout
 	  returned by the I-MDS, and the I-MDS has not recalled or
@@ -844,6 +896,15 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	  operations, and the L-MDS the OPEN operation is sent to
 	  might differ from the L-MDS the LOCK operation for the same
 	  target file is sent to.
+	</t>
+	<t>
+	  When a client obtains a non-layout stateid from an L-MDS, for
+	  example, as the result of an OPEN or CREATE operation, the stateid
+	  is asserted to be valid at the issuing L-MDS, and also the
+	  assocated I-MDS, as noted above.  In addition, if the client holds
+	  an inode striping layout on the current file system SHOULD
+	  request any associated stripe hint on the create object, ideally in
+	  same COMPOUND.
 	</t>
       </section>
       <section anchor="FCLeaseTerms" title="Lease Terms">
