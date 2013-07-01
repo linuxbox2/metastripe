@@ -871,12 +871,11 @@ Internet-Draft               pNFS Metastripe                   July 2013
    file is sent to.
 
    When a client obtains a non-layout stateid from an L-MDS, for
-   example, as the result of an OPEN or CREATE operation, the stateid is
-   asserted to be valid at the issuing L-MDS, and also the assocated
-   I-MDS, as noted above.  In addition, if the client holds an inode
-   striping layout on the current file system SHOULD request any
-   associated stripe hint on the create object, ideally in same
-   COMPOUND.
+   example, as the result of an OPEN operation, the stateid is asserted
+   to be valid at the issuing L-MDS, and also the assocated I-MDS, as
+   noted above.  In addition, if the client holds an inode striping
+   layout on the current file system, it SHOULD request the associated
+   stripe hint on the object, ideally in the same COMPOUND.
 
 6.4.  Lease Terms
 
@@ -886,6 +885,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
    as the result of a metadata layout.  The client has a lease for each
    client ID it has with an I-MDS or L-MDS, and each lease MUST be
    renewed separately for each client ID.
+
 
 
 
