@@ -573,24 +573,37 @@
 	    <!-- XXX comments on mdl_flags etc -->
 	  </t>
 	</section>
-	<section anchor="DefLayoutupdate4" title="Layoutupdate4
-						  lou_body">
-	  <figure align="left" anchor="fig_layoutupdate4">
-            <artwork><![CDATA[
-   ///  %/*
-   ///  % * LAYOUT4_METADATA.
-   ///  % * Encoded in the lou_body field of type layoutupdate4:
-   ///  % *    Nothing. lou_body is a zero length array of octets.
-   ///  % */
-   ///  %
+
+	<section anchor="Layoutupdate4" title="Layoutupdate4 lou_body">
+
+	    <figure align="left" anchor="fig_lou_body">
+              <artwork><![CDATA[
+///
+///  struct md_dentry_layoutupdate4 {
+///      int32_t mdlu_entries_added;
+///      int32_t mdlu_entries_removed;
+///      nfstime4 mdlu_last_update;
+///  };
+///
+///  % /*
+///  %  * Encoded in the lou_body field of data type
+///  %  * layoutupdate4:
+///  %  */
+///  struct md_layout_update4 {
+///      union md_layout_type switch (enum md_layout_subtype4 subtype) {
+///             case LAYOUTMETA4_INODE:
+///                     void;
+///             case LAYOUTMETA4_DENTRY:
+///                     md_layoutupdate4 mlu_dentry;
+///     };
+///  };
 ]]></artwork>
-          </figure>
-	  <t>
-	    The LAYOUT4_METADATA layout type has no content for
-	    lou_body member of the layoutupdate4 data type.
-	  </t>
+              <postamble>layoutupdate4 lou_body</postamble>
+            </figure>
+
 	</section>
       </section>
+
       <section anchor="SemanticsOfLayout" title="Metadata Layout
 						 Semantics">
 	<t>
@@ -792,32 +805,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	  added to and removed from the directory since the last LAYOUTCOMMIT
 	  operation.
 	</t>
-	    <figure align="left" anchor="fig_lou_body">
-              <artwork><![CDATA[
-///
-///  struct md_dentry_layoutupdate4 {
-///      int32_t mdlu_entries_added;
-///      int32_t mdlu_entries_removed;
-///      nfstime4 mdlu_last_update;
-///  };
-///
-///  % /*
-///  %  * Encoded in the lou_body field of data type
-///  %  * layoutupdate4:
-///  %  */
-///  struct md_layout_update4 {
-///      union md_layout_type switch (enum md_layout_subtype4 subtype) {
-///             case LAYOUTMETA4_INODE:
-///                     void;
-///             case LAYOUTMETA4_DENTRY:
-///                     md_layoutupdate4 mlu_dentry;
-///     };
-///  };
-]]></artwork>
-              <postamble>layoutupdate4 lou_body</postamble>
-            </figure>
       </section>
-      
     </section>
 
     <section anchor="FurtherConsiderations" title="Further
