@@ -1033,7 +1033,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	</figure>
 	</section>
       <section anchor="Usage-2" title="parallel create-layoutcommit">
-	<figure align="left" anchor="fig_usage_1">
+	<figure align="left" anchor="fig_usage_2">
           <artwork><![CDATA[
 	  I-MDS: LAYOUTGET for inode layout -> ino_stateid
 	  I-MDS: LAYOUTGET(dir) for dentry layout -> {dn_stateid, dn_deviceid, dn_placement}
@@ -1055,7 +1055,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	</figure>
       </section>
       <section anchor="Usage-3" title="parallel directory listing">
-	<figure align="left" anchor="fig_usage_1">
+	<figure align="left" anchor="fig_usage_3">
           <artwork><![CDATA[
 	  I-MDS: LAYOUTGET for inode layout -> ino_stateid
 	  I-MDS: LAYOUTGET(dir) for dentry layout -> dn_stateid, dn_deviceid
