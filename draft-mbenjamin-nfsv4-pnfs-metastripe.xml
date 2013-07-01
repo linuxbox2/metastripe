@@ -899,11 +899,11 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	</t>
 	<t>
 	  When a client obtains a non-layout stateid from an L-MDS, for
-	  example, as the result of an OPEN or CREATE operation, the stateid
+	  example, as the result of an OPEN operation, the stateid
 	  is asserted to be valid at the issuing L-MDS, and also the
 	  assocated I-MDS, as noted above.  In addition, if the client holds
-	  an inode striping layout on the current file system SHOULD
-	  request any associated stripe hint on the create object, ideally in
+	  an inode striping layout on the current file system, it SHOULD
+	  request the associated stripe hint on the object, ideally in the
 	  same COMPOUND.
 	</t>
       </section>
