@@ -805,7 +805,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	  added to and removed from the directory since the last LAYOUTCOMMIT
 	  operation.
 	</t>
-	    <figure align="left" anchor="fig_dir_enum_alg">
+	    <figure align="left" anchor="fig_lou_body">
               <artwork><![CDATA[
 ///
 ///  struct md_dentry_layoutupdate4 {
