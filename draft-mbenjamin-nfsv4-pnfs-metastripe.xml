@@ -1016,7 +1016,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 
     <section anchor="Negotiation" title="Negotiation">
       <t>
-	n pNFS client sends a GETATTR operation for attribute
+	The NFSv4.x client sends a GETATTR operation for attribute
 	fs_layout_type.  If the reply contains the metadata layout
 	type, then either or both of inode or dentry striping are
 	supported, subject to further verification by subsequent
