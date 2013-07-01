@@ -1036,8 +1036,10 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	<figure align="left" anchor="fig_usage_2">
           <artwork><![CDATA[
 	  I-MDS: LAYOUTGET for inode layout -> ino_stateid
-	  I-MDS: LAYOUTGET(dir) for dentry layout -> {dn_stateid, dn_deviceid, dn_placement}
-	  I-MDS: GETDEVICEINFO(dn_deviceid) -> [L-MDS1, L-MDS2, L-MDS3]
+	  I-MDS: LAYOUTGET(dir) for dentry layout 
+	    -> {dn_stateid, dn_deviceid, dn_placement}
+	  I-MDS: GETDEVICEINFO(dn_deviceid)
+	    -> [L-MDS1, L-MDS2, L-MDS3]
 
 	  dn_placement('foo') -> L-MDS1
 	  L-MDS1: CREATE(dir, 'foo')
@@ -1058,12 +1060,17 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	<figure align="left" anchor="fig_usage_3">
           <artwork><![CDATA[
 	  I-MDS: LAYOUTGET for inode layout -> ino_stateid
-	  I-MDS: LAYOUTGET(dir) for dentry layout -> dn_stateid, dn_deviceid
-	  I-MDS: GETDEVICEINFO(dn_deviceid) -> [L-MDS1, L-MDS2, L-MDS3]
+	  I-MDS: LAYOUTGET(dir) for dentry layout
+	    -> dn_stateid, dn_deviceid
+	  I-MDS: GETDEVICEINFO(dn_deviceid)
+	    -> [L-MDS1, L-MDS2, L-MDS3]
 
-	  L-MDS1: PREADDIR(dn_stateid, stripe=0, cookie=0) -> [a, b, c]
-	  L-MDS2: PREADDIR(dn_stateid, stripe=1, cookie=0) -> [d, e, f]
-	  L-MDS3: PREADDIR(dn_stateid, stripe=2, cookie=0) -> [g, h, i]
+	  L-MDS1: PREADDIR(dn_stateid, stripe=0, cookie=0)
+	    -> [a, b, c]
+	  L-MDS2: PREADDIR(dn_stateid, stripe=1, cookie=0)
+	    -> [d, e, f]
+	  L-MDS3: PREADDIR(dn_stateid, stripe=2, cookie=0)
+	    -> [g, h, i]
 
 	  I-MDS: LAYOUTRETURN(dn_stateid)
 	  I-MDS: LAYOUTRETURN(ino_stateid)

@@ -130,17 +130,17 @@ Internet-Draft               pNFS Metastripe                   July 2013
      6.10. Failure and Restart of Server  . . . . . . . . . . . . . . 18
    7.  Negotiation  . . . . . . . . . . . . . . . . . . . . . . . . . 18
    8.  Usage Examples . . . . . . . . . . . . . . . . . . . . . . . . 18
-     8.1.  Inode Striping 1 . . . . . . . . . . . . . . . . . . . . . 18
-   9.  Operational Recommendation for Deployment  . . . . . . . . . . 19
-   10. Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 19
-   11. Security Considerations  . . . . . . . . . . . . . . . . . . . 19
-   12. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 19
-   13. References . . . . . . . . . . . . . . . . . . . . . . . . . . 20
-     13.1. Normative References . . . . . . . . . . . . . . . . . . . 20
-     13.2. Informative References . . . . . . . . . . . . . . . . . . 21
-   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 21
-
-
+     8.1.  open-lock-write-close  . . . . . . . . . . . . . . . . . . 18
+     8.2.  parallel create-layoutcommit . . . . . . . . . . . . . . . 19
+     8.3.  parallel directory listing . . . . . . . . . . . . . . . . 20
+   9.  Operational Recommendation for Deployment  . . . . . . . . . . 20
+   10. Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 20
+   11. Security Considerations  . . . . . . . . . . . . . . . . . . . 20
+   12. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 21
+   13. References . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+     13.1. Normative References . . . . . . . . . . . . . . . . . . . 21
+     13.2. Informative References . . . . . . . . . . . . . . . . . . 22
+   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 22
 
 
 
@@ -989,18 +989,18 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
    This section contains illustrative examples of the protocol.
 
-8.1.  Inode Striping 1
+8.1.  open-lock-write-close
 
-   A client which detects that it has crossed a file system boundary
-   (see RFC 5661) checks whether the new file system supports
-   LAYOUT4_METADATA, and having verified this in the affirmative, the
-   client requests a layout of type LAYOUT4_METADATA and subtype
-   LAYOUTMETA4_INODE, using any file handle in the new file system
-   (e.g., the handle it just encountered).  The server implememtation
-   grants the client an appropriate layout.  Call the server instance
-   the client happens to be talking to S.
 
-   In subsequent READDIR and GETATTR operations on the new file system,
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1009,21 +1009,81 @@ Benjamin, et al.         Expires January 2, 2014               [Page 18]
 Internet-Draft               pNFS Metastripe                   July 2013
 
 
-   the client requests the recommended, get-only meta_stripe_deviceid
-   attribute for a regular file F. The client keeps the returned value
-   of meta_stripe_deviceid with other, NFSv4-specific attribute
-   information (e.g., in an NFS vnode structure).
+             I-MDS: LAYOUTGET for inode layout -> ino_stateid
+             I-MDS: OPEN('foo') -> open_stateid
+             I-MDS: GETATTR(meta_stripe_deviceid) -> in_deviceid
+             I-MDS: GETDEVICEINFO(in_deviceid) -> [L-MDS]
 
-   At some time later, an application client attempts to open F for
-   writing.  The client uses the GETDEVICEINFO operation to identify a
-   preferred address for operating on F. If the client has not already
-   negotiated an NFSv4.1 forward channel with the indicated server S2
-   (EXCHANGE_ID, CREATE_SESSION, etc), it does so, else it re-uses an
-   existing channel.  The client sends an OPEN request to S2, using the
-   filehandle it obtained previously from S1, obtaining a new open
-   stateid.  The client uses the new open stateid in subsequent READ,
-   WRITE, operations.  Eventually directed by the application to close
-   F, the client's interaction with F is completed.
+             L-MDS: LOCK(open_stateid) -> lock_stateid
+             L-MDS: WRITE(lock_stateid)
+             I-MDS: CLOSE(open_stateid)
+             I-MDS: LAYOUTRETURN(dn_stateid)
+             I-MDS: LAYOUTRETURN(ino_stateid)
+
+                                 Figure 8
+
+8.2.  parallel create-layoutcommit
+
+             I-MDS: LAYOUTGET for inode layout -> ino_stateid
+             I-MDS: LAYOUTGET(dir) for dentry layout
+               -> {dn_stateid, dn_deviceid, dn_placement}
+             I-MDS: GETDEVICEINFO(dn_deviceid)
+               -> [L-MDS1, L-MDS2, L-MDS3]
+
+             dn_placement('foo') -> L-MDS1
+             L-MDS1: CREATE(dir, 'foo')
+
+             dn_placement('bar') -> L-MDS2
+             L-MDS2: CREATE(dir, 'bar')
+
+             dn_placement('baz') -> L-MDS3
+             L-MDS3: CREATE(dir, 'baz')
+
+             I-MDS: LAYOUTCOMMIT(dn_stateid, +3)
+             I-MDS: LAYOUTRETURN(dn_stateid)
+             I-MDS: LAYOUTRETURN(ino_stateid)
+
+                                 Figure 9
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Benjamin, et al.         Expires January 2, 2014               [Page 19]
+
+Internet-Draft               pNFS Metastripe                   July 2013
+
+
+8.3.  parallel directory listing
+
+             I-MDS: LAYOUTGET for inode layout -> ino_stateid
+             I-MDS: LAYOUTGET(dir) for dentry layout
+               -> dn_stateid, dn_deviceid
+             I-MDS: GETDEVICEINFO(dn_deviceid)
+               -> [L-MDS1, L-MDS2, L-MDS3]
+
+             L-MDS1: PREADDIR(dn_stateid, stripe=0, cookie=0)
+               -> [a, b, c]
+             L-MDS2: PREADDIR(dn_stateid, stripe=1, cookie=0)
+               -> [d, e, f]
+             L-MDS3: PREADDIR(dn_stateid, stripe=2, cookie=0)
+               -> [g, h, i]
+
+             I-MDS: LAYOUTRETURN(dn_stateid)
+             I-MDS: LAYOUTRETURN(ino_stateid)
+
+                                 Figure 10
 
 
 9.  Operational Recommendation for Deployment
@@ -1053,18 +1113,18 @@ Internet-Draft               pNFS Metastripe                   July 2013
    client or server using the metadata layout type.
 
 
-12.  IANA Considerations
-
-   This specification requires an addition to the Layout Types registry
-   described in Section 22.4 of [NFSv4.1].  The five fields added to the
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 19]
+Benjamin, et al.         Expires January 2, 2014               [Page 20]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
 
+12.  IANA Considerations
+
+   This specification requires an addition to the Layout Types registry
+   described in Section 22.4 of [NFSv4.1].  The five fields added to the
    registy are:
 
    1.  Name of layout type: LAYOUT4_METADATA.
@@ -1109,17 +1169,17 @@ Internet-Draft               pNFS Metastripe                   July 2013
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
 
-   [RFC5226]  Narten, T. and H. Alvestrand, "Guidelines for Writing an
-              IANA Considerations Section in RFCs", BCP 26, RFC 5226,
-              May 2008.
 
 
 
-
-Benjamin, et al.         Expires January 2, 2014               [Page 20]
+Benjamin, et al.         Expires January 2, 2014               [Page 21]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
+
+   [RFC5226]  Narten, T. and H. Alvestrand, "Guidelines for Writing an
+              IANA Considerations Section in RFCs", BCP 26, RFC 5226,
+              May 2008.
 
 13.2.  Informative References
 
@@ -1168,9 +1228,5 @@ Authors' Addresses
 
 
 
-
-
-
-
-Benjamin, et al.         Expires January 2, 2014               [Page 21]
+Benjamin, et al.         Expires January 2, 2014               [Page 22]
 
