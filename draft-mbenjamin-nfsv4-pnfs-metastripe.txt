@@ -4,12 +4,12 @@
 NFSv4                                                        M. Benjamin
 Internet-Draft                                             CohortFS, LLC
 Intended status: Standards Track                                  Bodley
-Expires: January 2, 2014                                         Emerson
+Expires: January 3, 2014                                         Emerson
 
                                                                   Ersani
                                                                   NetApp
                                                                 Honeyman
-                                                            July 1, 2013
+                                                            July 2, 2013
 
 
                          pNFS Metadata Striping
@@ -45,14 +45,14 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 2, 2014.
+   This Internet-Draft will expire on January 3, 2014.
 
 Copyright Notice
 
 
 
 
-Benjamin, et al.         Expires January 2, 2014                [Page 1]
+Benjamin, et al.         Expires January 3, 2014                [Page 1]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -108,7 +108,7 @@ Table of Contents
 
 
 
-Benjamin, et al.         Expires January 2, 2014                [Page 2]
+Benjamin, et al.         Expires January 3, 2014                [Page 2]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -164,7 +164,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014                [Page 3]
+Benjamin, et al.         Expires January 3, 2014                [Page 3]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -220,7 +220,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014                [Page 4]
+Benjamin, et al.         Expires January 3, 2014                [Page 4]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -276,7 +276,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014                [Page 5]
+Benjamin, et al.         Expires January 3, 2014                [Page 5]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -332,7 +332,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014                [Page 6]
+Benjamin, et al.         Expires January 3, 2014                [Page 6]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -388,7 +388,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014                [Page 7]
+Benjamin, et al.         Expires January 3, 2014                [Page 7]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -399,7 +399,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 4.2.1.  Name-Based Operations
 
-   For name-based operations, the metadata layout indicates the
+   For name-based operations, the dentry striping layout indicates the
    preferred destinations in the network to send name-based operations
    for that directory (e.g., CREATE).  The preferred destinations MUST
    apply to the current filehandle that the operation uses.  In other
@@ -426,8 +426,8 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 4.2.2.  Directory Enumeration
 
-   For directory-enumeration operations, the metadata layout indicates
-   the preferred destination in the network to send directory reading
+   For directory-enumeration operations, the dentry striping layout
+   indicates the preferred destination in the network to send (P)READDIR
    operations for that directory.  For example, after the client obtains
    the filehandle of a directory via LOOKUP and the metadata layout via
    LAYOUTGET, the client wants to read the directory.  As with the
@@ -435,8 +435,8 @@ Internet-Draft               pNFS Metastripe                   July 2013
    addresses to which to send requests.  With the LAYOUT4_NFSV4_1_FILES
    layout, the choice of the index in list of network addresses was
    computed from the offset of the read or write request.  For dentry
-   striping layouts, the index merely counts from 0 to the dentry stripe
-   count, less 1.
+   striping layouts, the index counts from 0 to the dentry stripe count,
+   less 1.
 
 
 
@@ -444,7 +444,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014                [Page 8]
+Benjamin, et al.         Expires January 3, 2014                [Page 8]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -500,7 +500,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014                [Page 9]
+Benjamin, et al.         Expires January 3, 2014                [Page 9]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -556,7 +556,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 10]
+Benjamin, et al.         Expires January 3, 2014               [Page 10]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -612,7 +612,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 11]
+Benjamin, et al.         Expires January 3, 2014               [Page 11]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -668,7 +668,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 12]
+Benjamin, et al.         Expires January 3, 2014               [Page 12]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -724,7 +724,7 @@ Let deviceid = mdl_layout.mdln_devicelist[idx];
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 13]
+Benjamin, et al.         Expires January 3, 2014               [Page 13]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -780,7 +780,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 14]
+Benjamin, et al.         Expires January 3, 2014               [Page 14]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -836,7 +836,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 15]
+Benjamin, et al.         Expires January 3, 2014               [Page 15]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -892,7 +892,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 16]
+Benjamin, et al.         Expires January 3, 2014               [Page 16]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -948,7 +948,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 17]
+Benjamin, et al.         Expires January 3, 2014               [Page 17]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -1004,7 +1004,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 18]
+Benjamin, et al.         Expires January 3, 2014               [Page 18]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -1060,7 +1060,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 19]
+Benjamin, et al.         Expires January 3, 2014               [Page 19]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -1116,7 +1116,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 20]
+Benjamin, et al.         Expires January 3, 2014               [Page 20]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -1172,7 +1172,7 @@ Authors' Addresses
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 21]
+Benjamin, et al.         Expires January 3, 2014               [Page 21]
 
 Internet-Draft               pNFS Metastripe                   July 2013
 
@@ -1228,5 +1228,5 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.         Expires January 2, 2014               [Page 22]
+Benjamin, et al.         Expires January 3, 2014               [Page 22]
 
