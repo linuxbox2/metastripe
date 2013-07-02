@@ -425,22 +425,18 @@
 	  that directory.
 	</t>
 	<section anchor="NameBased" title="Name-Based Operations">
-	  <t>
-	    For name-based operations, the metadata layout indicates
-	    the preferred destinations in the network to send
-	    name-based operations for that directory (e.g., CREATE).
-	    The preferred destinations MUST apply to the current
-	    filehandle that the operation uses.  In other words, for
-	    LINK and RENAME, which take both the saved filehandle and
-	    the current filehandle as parameters, the pNFS client
-	    would use the stripe hint of the target directory
-	    (indicated in the current filehandle) for guidance where
-	    to send the operation.  Note that if an L-MDS accepts a
-	    LINK or RENAME operation, the L-MDS MUST perform the
-	    operation atomically.  If it cannot, then the L-MDS MUST
-	    return the error NFS4ERR_XDEV, and the client MUST send
-	    the operation to the I-MDS.
-	  </t>
+	  <t> For name-based operations, the dentry striping layout
+	  indicates the preferred destinations in the network to send name-based
+	  operations for that directory (e.g., CREATE).  The preferred
+	  destinations MUST apply to the current filehandle that the operation
+	  uses.  In other words, for LINK and RENAME, which take both the saved
+	  filehandle and the current filehandle as parameters, the pNFS client
+	  would use the stripe hint of the target directory (indicated in the
+	  current filehandle) for guidance where to send the operation.  Note
+	  that if an L-MDS accepts a LINK or RENAME operation, the L-MDS MUST
+	  perform the operation atomically.  If it cannot, then the L-MDS MUST
+	  return the error NFS4ERR_XDEV, and the client MUST send the operation
+	  to the I-MDS.  </t>
 	  <t>
 	    The choice of destination is a function of the name the
 	    client is requesting.  For example, after the client
@@ -461,19 +457,17 @@
 	<section anchor="DirectoryEnumeration" title="Directory
 						      Enumeration">
 	  <t>
-	    For directory-enumeration operations, the metadata layout
-	    indicates the preferred destination in the network to send
-	    directory reading operations for that directory.  For
-	    example, after the client obtains the filehandle of a
-	    directory via LOOKUP and the metadata layout via
-	    LAYOUTGET, the client wants to read the directory.  As
-	    with the LAYOUT4_NFSV4_1_FILES layout type, the client has
-	    a list network addresses to which to send requests.  With
-	    the LAYOUT4_NFSV4_1_FILES layout, the choice of the index
-	    in list of network addresses was computed from the offset
-	    of the read or write request.  For dentry striping
-	    layouts, the index merely counts from 0 to the dentry
-	    stripe count, less 1.
+	    For directory-enumeration operations, the dentry striping
+	    layout indicates the preferred destination in the network to send
+	    (P)READDIR operations for that directory.  For example, after
+	    the client obtains the filehandle of a directory via LOOKUP and the
+	    metadata layout via LAYOUTGET, the client wants to read the directory.
+	    As with the LAYOUT4_NFSV4_1_FILES layout type, the client has a list
+	    network addresses to which to send requests.  With the
+	    LAYOUT4_NFSV4_1_FILES layout, the choice of the index in list of
+	    network addresses was computed from the offset of the read or write
+	    request.  For dentry striping layouts, the index counts from 0
+	    to the dentry stripe count, less 1.
 	  </t>
 	</section>
       </section>
