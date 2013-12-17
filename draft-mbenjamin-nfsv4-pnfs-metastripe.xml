@@ -588,7 +588,7 @@
 ///             case LAYOUTMETA4_INODE:
 ///                     void;
 ///             case LAYOUTMETA4_DENTRY:
-///                     md_layoutupdate4 mlu_dentry;
+///                     md_dentry_layoutupdate4 mlu_dentry;
 ///     };
 ///  };
 ]]></artwork>
