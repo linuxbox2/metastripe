@@ -1009,7 +1009,6 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	  L-MDS: LOCK(open_stateid) -> lock_stateid
 	  L-MDS: WRITE(lock_stateid)
 	  I-MDS: CLOSE(open_stateid)
-	  I-MDS: LAYOUTRETURN(dn_stateid)
 	  I-MDS: LAYOUTRETURN(ino_stateid)
 	  ]]></artwork>
 	</figure>
