@@ -36,7 +36,7 @@
 <?rfc subcompact="no" ?>
 <!-- keep one blank line between list items -->
 <!-- end of list of popular I-D processing instructions -->
-<rfc category="std" docName="draft-mbenjamin-nfsv4-pnfs-metastripe-01" ipr="trust200902">
+<rfc category="std" docName="draft-mbenjamin-nfsv4-pnfs-metastripe-02" ipr="trust200902">
   <!-- category values: std, bcp, info, exp, and historic
      ipr values: full3667, noModification3667, noDerivatives3667
      you can add the attributes updates="NNNN" and obsoletes="NNNN" 
@@ -101,7 +101,7 @@
       </address>
     </author>
 
-    <date year="2013" />
+    <date year="2014" />
 
     <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
          in the current day for you. If only the current year is specified, xml2rfc will fill 
@@ -162,23 +162,22 @@
 	striped: the model presented in the NFSv4.1 specification is that of a
 	single metadata server.  This document describes a means to add
 	metadata striping to pNFS, which includes the notion of multiple
-	metadata servers.
+	metadata servers.  With metadata striping, multiple metadata
+	servers may work together to provide a higher parallel performance.
       </t>
 
       <t>
-	Two methods are described.  The first, called inode striping,
+	Two methods are described.  The first, called filehandle striping,
 	directs	metadata operations associated with a file handle to a
-	preferred metadata server.  The second, called dentry
+	preferred metadata server.  The second, called directory
 	striping, distributes directory operations across a collection
-	of metadata servers.  With metadata striping, multiple
-	metadata servers may work together to provide a higher
-	parallel performance.
+	of metadata servers.
       </t>
     </section>
 
     <section anchor="Changes" title="Short List of Protocol Changes
 				     from Previous Drafts">
-      <section anchor="InodeStriping" title="File-system wide Striping
+      <section anchor="FilehandleStriping" title="File-system wide Striping
 					     for Filehandle-Only
 					     Operations">
 	<t>
@@ -257,9 +256,9 @@
 	<section anchor="meta_stripe_deviceid"
 		 title="meta_stripe_deviceid (deviceid4)">
 	  <t>
-	    An attribute of type meta_stripe_deviceid represents an
-	    inode stripe hint.  This attribute MUST NOT be offered to
-	    clients unless they hold a valid inode striping layout on
+	    An attribute of type meta_stripe_deviceid represents a
+	    filehandle stripe hint.  This attribute MUST NOT be offered to
+	    clients unless they hold a valid filehandle striping layout on
 	    the containing file system.
 	  </t>
 	</section>
@@ -268,9 +267,9 @@
 	  <t>
 	    The meta_stripe_count attribute represents, for directory
 	    objects, the directory's current stripe count, which may
-	    help the client decide if it will request a dentry striping
+	    help the client decide if it will request a directory striping
 	    layout on the directory.  This attribute MAY be offered only
-	    to clients which hold an inode striping layout on the
+	    to clients which hold a filehandle striping layout on the
 	    containing file system.
 	  </t>
 	</section>
@@ -279,8 +278,8 @@
       <section anchor="PREADDIR" title="PREADDIR (Operation)">
 	<t>
 	  The NFSv4.1 READDIR operation has insufficient information
-	  to perform all possible enumerations required in our
-	  proposed dentry striping model.  We propose a new PREADDIR
+	  to perform all possible enumerations required in the
+	  proposed directory striping model.  We propose a new PREADDIR
 	  operation which takes, in addition to all the current
 	  READDIR operations, also a controlling metadata layout
 	  stateid and stripe number.
@@ -306,12 +305,12 @@
 	    NF4NAMEDATTR.
 	  </t>
 	  <t>
-	    Inode striping.  Hint-based indirection to a preferred MDS
+	    Filehandle striping.  Hint-based indirection to a preferred MDS
 	    for filehandle-based operations, backed by a
 	    filesystem-wide metadata layout.
 	  </t>
 	  <t>
-	    Dentry striping. Fine-grained, layout-based indirection
+	    Directory striping. Fine-grained, layout-based indirection
 	    for parallel operations on directories, using a striping
 	    pattern.
 	  </t>
@@ -366,20 +365,20 @@
 	operations, and is of two types:
 	<list>
 	  <t>
-	    inode striping uses hints (attribute-based indications)
+	    filehandle striping uses hints (attribute-based indications)
 	    backed by a filesystem-wide layout  to direct clients to a
 	    preferred MDS on which to perform filehandle-only
 	    operations
 	  </t>
 	  <t>
-	    dentry striping uses fine-grained metadata layouts on
+	    directory striping uses fine-grained metadata layouts on
 	    directories to support execution of name-based operations
 	    (directory enumeration, creates) on a set of MDS servers
 	    in parallel
 	  </t>
 	</list>
       </t>
-      <section anchor="InodeStriping2" title="Inode Striping">
+      <section anchor="FilehandleStriping2" title="Filehandle Striping">
 	<t>
 	  To avoid an explosion of new client state, a coarse-grained
 	  hinting mechanism is used to direct filehandle-only
@@ -388,7 +387,7 @@
 	<t>
 	  As specified in 5.12.1 of [NFSv4.1], when a client
 	  encounters file system which supports LAYOUT4_METADATA, it
-	  can obtain a metadata layout of subtype LAYOUTMETA4_INODE,
+	  can obtain a metadata layout of subtype LAYOUTMETA4_FILEHANDLE,
 	  whose scope is the entire file system, using the LAYOUTGET
 	  operation on any filehandle object in the file system which
 	  it is permitted to access.
@@ -402,7 +401,7 @@
 	</t>
 	<t>
 	  For example, suppose that after obtaining an ordinary
-	  filehandle via OPEN, a LAYOUTMETA4_INODE layout on the
+	  filehandle via OPEN, a LAYOUTMETA4_FILEHANDLE layout on the
 	  containing file system, and a meta_stripe_deviceid hint from
 	  a previous GETATTR, READDIR, or PREADDIR,, the client wants
 	  to get a byte range lock on the file.  The client sends the
@@ -410,7 +409,7 @@
 	  indicated by the meta_stripe_deviceid attribute.
 	</t>
       </section>
-      <section anchor="DentryStriping2" title="Dentry Striping">
+      <section anchor="DirectoryStriping2" title="Directory Striping">
 	<t>
 	  For name-based and directory enumeration operations, a more
 	  fine-grained, layout-based redirection mechanism is used.
@@ -419,13 +418,13 @@
 	  When a client obtains a filehandle for an object that is of
 	  type directory and wishes to take advantage of metadata
 	  striping, the client first obtains a metadata layout of
-	  subtype LAYOUTMETA4_DENTRY on the directory.  The client is
+	  subtype LAYOUTMETA4_DIRECTORY on the directory.  The client is
 	  provided with a directory-specific list of network addresses
 	  (devices) to which to send requests specific to objects in
 	  that directory.
 	</t>
 	<section anchor="NameBased" title="Name-Based Operations">
-	  <t> For name-based operations, the dentry striping layout
+	  <t> For name-based operations, the directory striping layout
 	  indicates the preferred destinations in the network to send name-based
 	  operations for that directory (e.g., CREATE).  The preferred
 	  destinations MUST apply to the current filehandle that the operation
@@ -457,7 +456,7 @@
 	<section anchor="DirectoryEnumeration" title="Directory
 						      Enumeration">
 	  <t>
-	    For directory-enumeration operations, the dentry striping
+	    For directory-enumeration operations, the directory striping
 	    layout indicates the preferred destination in the network to send
 	    (P)READDIR operations for that directory.  For example, after
 	    the client obtains the filehandle of a directory via LOOKUP and the
@@ -466,8 +465,8 @@
 	    network addresses to which to send requests.  With the
 	    LAYOUT4_NFSV4_1_FILES layout, the choice of the index in list of
 	    network addresses was computed from the offset of the read or write
-	    request.  For dentry striping layouts, the index counts from 0
-	    to the dentry stripe count, less 1.
+	    request.  For directory striping layouts, the index counts from 0
+	    to the directory stripe count, less 1.
 	  </t>
 	</section>
       </section>
@@ -507,8 +506,8 @@
 	    LAYOUT4_METDATA layout type is composed of four fields,
 	    each optional.  Using some combination of the
 	    mdlh_min_est, mdlh_avg_est, and mdlh_max_est fields, the
-	    client is enabled to give an indication of the dentry
-	    workload it expects for a new directory inode.  The client
+	    client is enabled to give an indication of the directory
+	    workload it expects for a new directory.  The client
 	    also may suggest an explicit stripe count or modulus
 	    preference in mdlh_stripe_count or mdlh_stripe_modulus,
 	    which SHOULD be congruent if specified together.
@@ -531,8 +530,8 @@
 	  <figure align="left" anchor="fig_metadata_layout">
             <artwork><![CDATA[
 ///  enum md_layout_subtype4 {
-///     LAYOUTMETA4_INODE = 0,
-///     LAYOUTMETA4_DENTRY
+///     LAYOUTMETA4_FILEHANDLE = 0,
+///     LAYOUTMETA4_DIRECTORY
 ///  };
 
 ///
@@ -542,7 +541,7 @@
 ///  };
 ///
 
-///  struct md_layout_dentry {
+///  struct md_layout_directory {
 ///     switch(uint32_t mdln_namebased_alg) {
 ///             case MDN_ALG_CITYHASH64:
 ///                     uint32_t seed;
@@ -555,10 +554,10 @@
 ///  struct md_layout4 {
 ///     union md_layout_type
 ///             switch (enum md_layout_subtype4 subtype) {
-///             case LAYOUTMETA4_INODE:
+///             case LAYOUTMETA4_FILEHANDLE:
 ///                     void;
-///             case LAYOUTMETA4_DENTRY:
-///                     md_layout_dentry mdl_layout;
+///             case LAYOUTMETA4_DIRECTORY:
+///                     md_layout_directory mdl_layout;
 ///     };
 ///  };
 ]]></artwork>
@@ -573,7 +572,7 @@
 	    <figure align="left" anchor="fig_lou_body">
               <artwork><![CDATA[
 ///
-///  struct md_dentry_layoutupdate4 {
+///  struct md_directory_layoutupdate4 {
 ///      int32_t mdlu_entries_added;
 ///      int32_t mdlu_entries_removed;
 ///      nfstime4 mdlu_last_update;
@@ -585,10 +584,10 @@
 ///  %  */
 ///  struct md_layout_update4 {
 ///      union md_layout_type switch (enum md_layout_subtype4 subtype) {
-///             case LAYOUTMETA4_INODE:
+///             case LAYOUTMETA4_FILEHANDLE:
 ///                     void;
-///             case LAYOUTMETA4_DENTRY:
-///                     md_dentry_layoutupdate4 mlu_dentry;
+///             case LAYOUTMETA4_DIRECTORY:
+///                     md_directory_layoutupdate4 mlu_directory;
 ///     };
 ///  };
 ]]></artwork>
@@ -609,23 +608,35 @@
 						    Conventions">
 	  <t>
 	    When a client requests a layout of type LAYOUT4_METADATA,
-	    it specifies the desired subtype, which must be one of
-	    LAYOUTMETA4_INODE or LAYOUTMETA4_DENTRY, as the value of
-	    the LAYOUTGET loga_iomode argument.
+	    it specifies the desired subtype, which MUST be one of
+	    LAYOUTMETA4_FILEHANDLE or LAYOUTMETA4_DIRECTORY, as the value of
+	    the LAYOUTGET loga_iomode argument.  Server
+	    implementations should reject LAYOUTGET requests with
+	    other values for loga_iomode.
+	  </t>
+	  <t>
+	    The value provided for loga_stateid may be any valid
+	    stateid for the related file or directory, or else the
+	    anonymous stateid.
+	  </t>
+	  <t>
+	    The values provided for loga_offset, loga_length, and
+	    loga_minlength are not defined for metastripe layouts, and
+	    server implementations MUST NOT intepret these values.
 	  </t>
 	</section>
-	<section anchor="SemanticsInodeStriping" title="Inode Striping
+	<section anchor="SemanticsFilehandleStriping" title="Filehandle Striping
 							Layouts">
 	  <t>
-	    If the requested layout is of subtype LAYOUTMETA4_INODE,
-	    the value of the layout is void.  The inode redirection
+	    If the requested layout is of subtype LAYOUTMETA4_FILEHANDLE,
+	    the value of the layout is void.  The filehandle redirection
 	    information issued under auspices of the layout will be
-	    entirely in the form of inode striping attribute hints.
+	    entirely in the form of filehandle striping attribute hints.
 	  </t>
 	  <t>
-	    As noted in Section 4, the scope of inode striping layouts
+	    As noted in Section 4, the scope of filehandle striping layouts
 	    is an entire file system.  The client can acquire the
-	    (singleton) inode striping layout for a given file system
+	    (singleton) filehandle striping layout for a given file system
 	    using any corresponding file handle which it happens to
 	    hold, and whose object the client is permitted to access.
 	    For example, the client could use the file handle of the
@@ -633,16 +644,16 @@
 	    provided the file server is an NFSv4.x file server that
 	    supports layouts of type LAYOUT4_METADATA.
 	  </t>
-	  <section anchor="SISStripeHints" title="Inode Stripe Hints">
+	  <section anchor="SISStripeHints" title="Filehandle Stripe Hints">
 	    <t>
-	      Inode stripe hints are objects of type deviceid4, and
+	      Filehandle stripe hints are objects of type deviceid4, and
 	      are the value of a new recommended, get-only attribute
 	      meta_stripe_deviceid.
 	    </t>
 	    <t>
 	      A client may successfully obtain the
 	      meta_stripe_deviceid attribute on any file object if and
-	      only if it has successfully obtained an inode striping
+	      only if it has successfully obtained a filehandle striping
 	      layout on the containing file system.  Since the
 	      meta_stripe_deviceid hint is an ordinary NFSv4
 	      attribute, the client may acquire it from a GETATTR,
@@ -653,7 +664,7 @@
 	      layout stateid that has been presented.
 	    </t>
 	    <t>
-	      At all events, when a client holds an inode stripe hint
+	      At all events, when a client holds a filehandle stripe hint
 	      for a file object, it uses the GETDEVICEINFO operation
 	      to map the hint value to a to a device address of data
 	      type md_layout_addr4 in the ordinary pNFS manner.
@@ -661,16 +672,16 @@
 	    <t>
 	      The server ensures that each such device remains
 	      accessible (unrecalled) for at least as long as any
-	      inode striping layout exists for which the device has
+	      filehandle striping layout exists for which the device has
 	      been named in a hint.
 	    </t>
 	  </section>
 	</section>
-	<section anchor="SemanticsDentryStriping" title="Dentry
+	<section anchor="SemanticsDirectoryStriping" title="Directory
 							 Striping
 							 Layouts">
 	  <t>
-	    If the requested layout is of subtype LAYOUTMETA4_DENTRY,
+	    If the requested layout is of subtype LAYOUTMETA4_DIRECTORY,
 	    then the layout contains a <![CDATA[<]]>device list,
 	    striping pattern, algorithm<![CDATA[>]]> triple enabling
 	    the client to perform both parallel directory enumeration
@@ -678,7 +689,7 @@
 	    outlined in Section 4.
 	  </t>
 	  <t>
-	    When the layout subtype is LAYOUTMETA4_DENTRY, the layout
+	    When the layout subtype is LAYOUTMETA4_DIRECTORY, the layout
 	    content provides an integer identifying a hashing
 	    algorithm, a list of deviceids, and a striping pattern.
 	    Then mdln_namebased_alg identifies an algorithm that maps
@@ -702,7 +713,7 @@
 	  <section anchor="SDSNamebased" title="L-MDS Selection for Name-based
 						Operations">
 	    <t>
-	      Clients with layouts of type LAYOUTMETA4_DENTRY may use
+	      Clients with layouts of type LAYOUTMETA4_DIRECTORY may use
 	      the algorithm supplied in field mdln_namebased_alg of
 	      the layout content to compute a preferred L-MDS to use
 	      when performing name-based operations, as follows:
@@ -740,7 +751,7 @@ Let deviceid = mdl_layout.mdln_devicelist[idx];
 	  <section anchor="SDSDirectoryEnum" title="Directory
 						    Enumeration">
 	    <t>
-	      Clients with layouts of type LAYOUTMETA4_DENTRY may use
+	      Clients with layouts of type LAYOUTMETA4_DIRECTORY may use
 	      the following algorithm to perform enumeration of
 	      striped directories preferred metadata servers, in
 	      parallel:
@@ -789,12 +800,14 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 
       <section anchor="LAYOUTCOMMIT" title="LAYOUTCOMMIT">
 	<t>
-	  As inode striping layouts are effectively read-only, the layout
-	  specific data for metastripe layouts of subtype LAYOUTMETA4_INODE
-	  is void.
+	  As filehandle striping layouts are effectively read-only,
+	  clients SHOULD NOT attempt commits on filehandle striping
+	  layouts.  If a server implementation receives a LAYOUTCOMMIT
+	  for a valid filehandle striping layout, it SHOULD return
+	  NFS4ERR_OK.
 	</t>
 	<t>
-	  For metastripe layouts of subtype LAYOUTMETA4_DENTRY, the layout
+	  For metastripe layouts of subtype LAYOUTMETA4_DIRECTORY, the layout
 	  specific data for LAYOUTCOMMIT contains the signed count of items
 	  added to and removed from the directory since the last LAYOUTCOMMIT
 	  operation.
@@ -871,9 +884,16 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	  example, as the result of an OPEN operation, the stateid
 	  is asserted to be valid at the issuing L-MDS, and also the
 	  assocated I-MDS, as noted above.  In addition, if the client holds
-	  an inode striping layout on the current file system, it SHOULD
+	  a filehandle striping layout on the current file system, it SHOULD
 	  request the associated stripe hint on the object, ideally in the
 	  same COMPOUND.
+	</t>
+	<t>
+	  When responding to client LAYOUTGET requests, server implementations
+	  MUST accept the anonymous stateid as a valid stateid for
+	  both LAYOUTMETA4_FILEHANDLE and LAYOUTMETA4_DIRECTORY
+	  layouts, but MAY return NFS4ERR_BADSTATEID for other
+	  stateids, when appropriate.
 	</t>
       </section>
       <section anchor="FCLeaseTerms" title="Lease Terms">
@@ -930,15 +950,15 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	  <t>
 	    If the implementation wishes to restripe a directory on
 	    which there are outstanding layouts of type
-	    LAYOUTMETA4_DENTRY, it must first successfully recall
+	    LAYOUTMETA4_DIRECTORY, it must first successfully recall
 	    these layouts at their controlling I-MDS servers, as
 	    described in <xref target="NFSv4.1"/>.
 	  </t>
 	  <t>
-	    If the implementation wishes to perform inode restriping
-	    which would invalidate any inode stripe hint which it has
+	    If the implementation wishes to perform filehandle restriping
+	    which would invalidate any filehandle stripe hint which it has
 	    issued to clients, it MUST successfully recall all
-	    controlling layouts of type LAYOUTMETA4_INODE which would
+	    controlling layouts of type LAYOUTMETA4_FILEHANDLE which would
 	    conflict with the restriping.
 	  </t>
 	  <t>
@@ -951,13 +971,13 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	</section>
 	<section anchor="FCRHints" title="Hint Invalidation">
 	  <t>
-	    When an implementation wishes to perform inode restriping
-	    that would invalidate an inode stripe hint or hints it has
+	    When an implementation wishes to perform filehandle restriping
+	    that would invalidate an ilehandle stripe hint or hints it has
 	    issued to clients, it can use ordinary NFSv4.1
-	    invalidation to reclaim the hints.  Since inode stripe
+	    invalidation to reclaim the hints.  Since filehandle stripe
 	    hints are recommended attributes, the controlling I-MDS or
 	    L-MDS does this by updating the change attribute on the
-	    inode being updated, as it would for any other inode
+	    file being updated, as it would for any other file
 	    update.
 	  </t>
 	</section>
@@ -987,7 +1007,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
       <t>
 	The NFSv4.x client sends a GETATTR operation for attribute
 	fs_layout_type.  If the reply contains the metadata layout
-	type, then either or both of inode or dentry striping are
+	type, then either or both of filehandle or directory striping are
 	supported, subject to further verification by subsequent
 	LAYOUTGET operations.  If not, the client cannot use metadata
 	striping.
@@ -1001,7 +1021,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
       <section anchor="Usage-1" title="open-lock-write-close">
 	<figure align="left" anchor="fig_usage_1">
           <artwork><![CDATA[
-	  I-MDS: LAYOUTGET for inode layout -> ino_stateid
+	  I-MDS: LAYOUTGET for filehandle layout -> fh_stateid
 	  I-MDS: OPEN('foo') -> open_stateid
 	  I-MDS: GETATTR(meta_stripe_deviceid) -> in_deviceid
 	  I-MDS: GETDEVICEINFO(in_deviceid) -> [L-MDS]
@@ -1009,39 +1029,39 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	  L-MDS: LOCK(open_stateid) -> lock_stateid
 	  L-MDS: WRITE(lock_stateid)
 	  I-MDS: CLOSE(open_stateid)
-	  I-MDS: LAYOUTRETURN(ino_stateid)
+	  I-MDS: LAYOUTRETURN(fh_stateid)
 	  ]]></artwork>
 	</figure>
 	</section>
       <section anchor="Usage-2" title="parallel create-layoutcommit">
 	<figure align="left" anchor="fig_usage_2">
           <artwork><![CDATA[
-	  I-MDS: LAYOUTGET for inode layout -> ino_stateid
-	  I-MDS: LAYOUTGET(dir) for dentry layout 
-	    -> {dn_stateid, dn_deviceid, dn_placement}
-	  I-MDS: GETDEVICEINFO(dn_deviceid)
+	  I-MDS: LAYOUTGET for filehandle layout -> fh_stateid
+	  I-MDS: LAYOUTGET(dir) for directory layout 
+	    -> {dir_stateid, dir_deviceid, dir_placement}
+	  I-MDS: GETDEVICEINFO(dir_deviceid)
 	    -> [L-MDS1, L-MDS2, L-MDS3]
 
-	  dn_placement('foo') -> L-MDS1
+	  dir_placement('foo') -> L-MDS1
 	  L-MDS1: CREATE(dir, 'foo')
 
-	  dn_placement('bar') -> L-MDS2
+	  dir_placement('bar') -> L-MDS2
 	  L-MDS2: CREATE(dir, 'bar')
 
-	  dn_placement('baz') -> L-MDS3
+	  dir_placement('baz') -> L-MDS3
 	  L-MDS3: CREATE(dir, 'baz')
 
-	  I-MDS: LAYOUTCOMMIT(dn_stateid, +3)
+	  I-MDS: LAYOUTCOMMIT(dir_stateid, +3)
 	  I-MDS: LAYOUTRETURN(dn_stateid)
-	  I-MDS: LAYOUTRETURN(ino_stateid)
+	  I-MDS: LAYOUTRETURN(fh_stateid)
 	  ]]></artwork>
 	</figure>
       </section>
       <section anchor="Usage-3" title="parallel directory listing">
 	<figure align="left" anchor="fig_usage_3">
           <artwork><![CDATA[
-	  I-MDS: LAYOUTGET for inode layout -> ino_stateid
-	  I-MDS: LAYOUTGET(dir) for dentry layout
+	  I-MDS: LAYOUTGET for filehandle layout -> fh_stateid
+	  I-MDS: LAYOUTGET(dir) for directory layout
 	    -> dn_stateid, dn_deviceid
 	  I-MDS: GETDEVICEINFO(dn_deviceid)
 	    -> [L-MDS1, L-MDS2, L-MDS3]
@@ -1054,7 +1074,7 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	    -> [g, h, i]
 
 	  I-MDS: LAYOUTRETURN(dn_stateid)
-	  I-MDS: LAYOUTRETURN(ino_stateid)
+	  I-MDS: LAYOUTRETURN(fh_stateid)
 	  ]]></artwork>
 	</figure>
       </section>

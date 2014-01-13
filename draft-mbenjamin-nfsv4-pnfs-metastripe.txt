@@ -4,16 +4,16 @@
 NFSv4                                                        M. Benjamin
 Internet-Draft                                             CohortFS, LLC
 Intended status: Standards Track                                  Bodley
-Expires: January 14, 2014                                        Emerson
+Expires: July 17, 2014                                           Emerson
 
                                                                   Ersani
                                                                   NetApp
                                                                 Honeyman
-                                                           July 13, 2013
+                                                        January 13, 2014
 
 
                          pNFS Metadata Striping
-                draft-mbenjamin-nfsv4-pnfs-metastripe-01
+                draft-mbenjamin-nfsv4-pnfs-metastripe-02
 
 Abstract
 
@@ -45,19 +45,19 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on January 14, 2014.
+   This Internet-Draft will expire on July 17, 2014.
 
 Copyright Notice
 
 
 
 
-Benjamin, et al.        Expires January 14, 2014                [Page 1]
+Benjamin, et al.          Expires July 17, 2014                 [Page 1]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
-   Copyright (c) 2013 IETF Trust and the persons identified as the
+   Copyright (c) 2014 IETF Trust and the persons identified as the
    document authors.  All rights reserved.
 
    This document is subject to BCP 78 and the IETF Trust's Legal
@@ -87,8 +87,8 @@ Table of Contents
      2.7.  PREADDIR (Operation) . . . . . . . . . . . . . . . . . . .  5
    3.  Terminology  . . . . . . . . . . . . . . . . . . . . . . . . .  6
    4.  Scope of Metadata Layouts  . . . . . . . . . . . . . . . . . .  6
-     4.1.  Inode Striping . . . . . . . . . . . . . . . . . . . . . .  7
-     4.2.  Dentry Striping  . . . . . . . . . . . . . . . . . . . . .  7
+     4.1.  Filehandle Striping  . . . . . . . . . . . . . . . . . . .  7
+     4.2.  Directory Striping . . . . . . . . . . . . . . . . . . . .  7
        4.2.1.  Name-Based Operations  . . . . . . . . . . . . . . . .  8
        4.2.2.  Directory Enumeration  . . . . . . . . . . . . . . . .  8
    5.  The Metadata Striping Layout . . . . . . . . . . . . . . . . .  9
@@ -101,33 +101,33 @@ Table of Contents
        5.3.4.  Layoutupdate4 lou_body . . . . . . . . . . . . . . . . 11
      5.4.  Metadata Layout Semantics  . . . . . . . . . . . . . . . . 11
        5.4.1.  LAYOUTGET Argument Conventions . . . . . . . . . . . . 11
-       5.4.2.  Inode Striping Layouts . . . . . . . . . . . . . . . . 11
-         5.4.2.1.  Inode Stripe Hints . . . . . . . . . . . . . . . . 12
-       5.4.3.  Dentry Striping Layouts  . . . . . . . . . . . . . . . 12
+       5.4.2.  Filehandle Striping Layouts  . . . . . . . . . . . . . 12
+         5.4.2.1.  Filehandle Stripe Hints  . . . . . . . . . . . . . 12
+       5.4.3.  Directory Striping Layouts . . . . . . . . . . . . . . 12
          5.4.3.1.  L-MDS Selection for Name-based Operations  . . . . 13
 
 
 
-Benjamin, et al.        Expires January 14, 2014                [Page 2]
+Benjamin, et al.          Expires July 17, 2014                 [Page 2]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
-         5.4.3.2.  Directory Enumeration  . . . . . . . . . . . . . . 13
-     5.5.  LAYOUTCOMMIT . . . . . . . . . . . . . . . . . . . . . . . 14
+         5.4.3.2.  Directory Enumeration  . . . . . . . . . . . . . . 14
+     5.5.  LAYOUTCOMMIT . . . . . . . . . . . . . . . . . . . . . . . 15
    6.  Further Considerations . . . . . . . . . . . . . . . . . . . . 15
      6.1.  Storage Access Protocols . . . . . . . . . . . . . . . . . 15
      6.2.  Revocation of Layouts  . . . . . . . . . . . . . . . . . . 15
      6.3.  Stateids . . . . . . . . . . . . . . . . . . . . . . . . . 15
      6.4.  Lease Terms  . . . . . . . . . . . . . . . . . . . . . . . 16
      6.5.  Layout Operations Sent to an L-MDS . . . . . . . . . . . . 16
-     6.6.  Filehandles in Metadata Layouts  . . . . . . . . . . . . . 16
+     6.6.  Filehandles in Metadata Layouts  . . . . . . . . . . . . . 17
      6.7.  Restriping . . . . . . . . . . . . . . . . . . . . . . . . 17
        6.7.1.  Layout Recall Cases  . . . . . . . . . . . . . . . . . 17
        6.7.2.  Hint Invalidation  . . . . . . . . . . . . . . . . . . 17
-     6.8.  Recovery . . . . . . . . . . . . . . . . . . . . . . . . . 17
-     6.9.  Failure and Restart of Client  . . . . . . . . . . . . . . 17
-     6.10. Failure and Restart of Server  . . . . . . . . . . . . . . 17
+     6.8.  Recovery . . . . . . . . . . . . . . . . . . . . . . . . . 18
+     6.9.  Failure and Restart of Client  . . . . . . . . . . . . . . 18
+     6.10. Failure and Restart of Server  . . . . . . . . . . . . . . 18
    7.  Negotiation  . . . . . . . . . . . . . . . . . . . . . . . . . 18
    8.  Usage Examples . . . . . . . . . . . . . . . . . . . . . . . . 18
      8.1.  open-lock-write-close  . . . . . . . . . . . . . . . . . . 18
@@ -164,9 +164,9 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.        Expires January 14, 2014                [Page 3]
+Benjamin, et al.          Expires July 17, 2014                 [Page 3]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
 1.  Introduction and Motivation
@@ -177,14 +177,15 @@ Internet-Draft               pNFS Metastripe                   July 2013
    Metadata is not distributed or striped: the model presented in the
    NFSv4.1 specification is that of a single metadata server.  This
    document describes a means to add metadata striping to pNFS, which
-   includes the notion of multiple metadata servers.
+   includes the notion of multiple metadata servers.  With metadata
+   striping, multiple metadata servers may work together to provide a
+   higher parallel performance.
 
-   Two methods are described.  The first, called inode striping, directs
-   metadata operations associated with a file handle to a preferred
-   metadata server.  The second, called dentry striping, distributes
-   directory operations across a collection of metadata servers.  With
-   metadata striping, multiple metadata servers may work together to
-   provide a higher parallel performance.
+   Two methods are described.  The first, called filehandle striping,
+   directs metadata operations associated with a file handle to a
+   preferred metadata server.  The second, called directory striping,
+   distributes directory operations across a collection of metadata
+   servers.
 
 
 2.  Short List of Protocol Changes from Previous Drafts
@@ -219,10 +220,9 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-
-Benjamin, et al.        Expires January 14, 2014                [Page 4]
+Benjamin, et al.          Expires July 17, 2014                 [Page 4]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
 2.4.  Cookie Model
@@ -253,32 +253,32 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 2.6.1.  meta_stripe_deviceid (deviceid4)
 
-   An attribute of type meta_stripe_deviceid represents an inode stripe
-   hint.  This attribute MUST NOT be offered to clients unless they hold
-   a valid inode striping layout on the containing file system.
+   An attribute of type meta_stripe_deviceid represents a filehandle
+   stripe hint.  This attribute MUST NOT be offered to clients unless
+   they hold a valid filehandle striping layout on the containing file
+   system.
 
 2.6.2.  meta_stripe_count (uint32_t)
 
    The meta_stripe_count attribute represents, for directory objects,
    the directory's current stripe count, which may help the client
-   decide if it will request a dentry striping layout on the directory.
-   This attribute MAY be offered only to clients which hold an inode
-   striping layout on the containing file system.
+   decide if it will request a directory striping layout on the
+   directory.  This attribute MAY be offered only to clients which hold
+   a filehandle striping layout on the containing file system.
 
 2.7.  PREADDIR (Operation)
 
    The NFSv4.1 READDIR operation has insufficient information to perform
-   all possible enumerations required in our proposed dentry striping
+   all possible enumerations required in the proposed directory striping
    model.  We propose a new PREADDIR operation which takes, in addition
    to all the current READDIR operations, also a controlling metadata
    layout stateid and stripe number.
 
 
 
-
-Benjamin, et al.        Expires January 14, 2014                [Page 5]
+Benjamin, et al.          Expires July 17, 2014                 [Page 5]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
 3.  Terminology
@@ -293,11 +293,11 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
       Regular file: An object of file type NF4REG or NF4NAMEDATTR.
 
-      Inode striping.  Hint-based indirection to a preferred MDS for
-      filehandle-based operations, backed by a filesystem-wide metadata
-      layout.
+      Filehandle striping.  Hint-based indirection to a preferred MDS
+      for filehandle-based operations, backed by a filesystem-wide
+      metadata layout.
 
-      Dentry striping.  Fine-grained, layout-based indirection for
+      Directory striping.  Fine-grained, layout-based indirection for
       parallel operations on directories, using a striping pattern.
 
 
@@ -332,9 +332,9 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.        Expires January 14, 2014                [Page 6]
+Benjamin, et al.          Expires July 17, 2014                 [Page 6]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
       Directory-enumeration.  These are operations that take one
@@ -345,15 +345,16 @@ Internet-Draft               pNFS Metastripe                   July 2013
    Metadata striping applies to all of the foregoing NFSv4.x operations,
    and is of two types:
 
-      inode striping uses hints (attribute-based indications) backed by
-      a filesystem-wide layout to direct clients to a preferred MDS on
-      which to perform filehandle-only operations
+      filehandle striping uses hints (attribute-based indications)
+      backed by a filesystem-wide layout to direct clients to a
+      preferred MDS on which to perform filehandle-only operations
 
-      dentry striping uses fine-grained metadata layouts on directories
-      to support execution of name-based operations (directory
-      enumeration, creates) on a set of MDS servers in parallel
+      directory striping uses fine-grained metadata layouts on
+      directories to support execution of name-based operations
+      (directory enumeration, creates) on a set of MDS servers in
+      parallel
 
-4.1.  Inode Striping
+4.1.  Filehandle Striping
 
    To avoid an explosion of new client state, a coarse-grained hinting
    mechanism is used to direct filehandle-only operations to a preferred
@@ -361,9 +362,9 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
    As specified in 5.12.1 of [NFSv4.1], when a client encounters file
    system which supports LAYOUT4_METADATA, it can obtain a metadata
-   layout of subtype LAYOUTMETA4_INODE, whose scope is the entire file
-   system, using the LAYOUTGET operation on any filehandle object in the
-   file system which it is permitted to access.
+   layout of subtype LAYOUTMETA4_FILEHANDLE, whose scope is the entire
+   file system, using the LAYOUTGET operation on any filehandle object
+   in the file system which it is permitted to access.
 
    Then using ordinary READDIR and GETATTR requests, the client can
    obtain for any object in the file system a meta_stripe_deviceid
@@ -371,46 +372,46 @@ Internet-Draft               pNFS Metastripe                   July 2013
    or name-based operations for that object.
 
    For example, suppose that after obtaining an ordinary filehandle via
-   OPEN, a LAYOUTMETA4_INODE layout on the containing file system, and a
-   meta_stripe_deviceid hint from a previous GETATTR, READDIR, or
+   OPEN, a LAYOUTMETA4_FILEHANDLE layout on the containing file system,
+   and a meta_stripe_deviceid hint from a previous GETATTR, READDIR, or
    PREADDIR,, the client wants to get a byte range lock on the file.
    The client sends the LOCK request to the network address (pNFS
    device, L-MDS) indicated by the meta_stripe_deviceid attribute.
 
-4.2.  Dentry Striping
+4.2.  Directory Striping
 
    For name-based and directory enumeration operations, a more fine-
    grained, layout-based redirection mechanism is used.
 
    When a client obtains a filehandle for an object that is of type
    directory and wishes to take advantage of metadata striping, the
-   client first obtains a metadata layout of subtype LAYOUTMETA4_DENTRY
 
 
 
-Benjamin, et al.        Expires January 14, 2014                [Page 7]
+Benjamin, et al.          Expires July 17, 2014                 [Page 7]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
-   on the directory.  The client is provided with a directory-specific
-   list of network addresses (devices) to which to send requests
-   specific to objects in that directory.
+   client first obtains a metadata layout of subtype
+   LAYOUTMETA4_DIRECTORY on the directory.  The client is provided with
+   a directory-specific list of network addresses (devices) to which to
+   send requests specific to objects in that directory.
 
 4.2.1.  Name-Based Operations
 
-   For name-based operations, the dentry striping layout indicates the
-   preferred destinations in the network to send name-based operations
-   for that directory (e.g., CREATE).  The preferred destinations MUST
-   apply to the current filehandle that the operation uses.  In other
-   words, for LINK and RENAME, which take both the saved filehandle and
-   the current filehandle as parameters, the pNFS client would use the
-   stripe hint of the target directory (indicated in the current
-   filehandle) for guidance where to send the operation.  Note that if
-   an L-MDS accepts a LINK or RENAME operation, the L-MDS MUST perform
-   the operation atomically.  If it cannot, then the L-MDS MUST return
-   the error NFS4ERR_XDEV, and the client MUST send the operation to the
-   I-MDS.
+   For name-based operations, the directory striping layout indicates
+   the preferred destinations in the network to send name-based
+   operations for that directory (e.g., CREATE).  The preferred
+   destinations MUST apply to the current filehandle that the operation
+   uses.  In other words, for LINK and RENAME, which take both the saved
+   filehandle and the current filehandle as parameters, the pNFS client
+   would use the stripe hint of the target directory (indicated in the
+   current filehandle) for guidance where to send the operation.  Note
+   that if an L-MDS accepts a LINK or RENAME operation, the L-MDS MUST
+   perform the operation atomically.  If it cannot, then the L-MDS MUST
+   return the error NFS4ERR_XDEV, and the client MUST send the operation
+   to the I-MDS.
 
    The choice of destination is a function of the name the client is
    requesting.  For example, after the client obtains the filehandle of
@@ -426,7 +427,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 4.2.2.  Directory Enumeration
 
-   For directory-enumeration operations, the dentry striping layout
+   For directory-enumeration operations, the directory striping layout
    indicates the preferred destination in the network to send (P)READDIR
    operations for that directory.  For example, after the client obtains
    the filehandle of a directory via LOOKUP and the metadata layout via
@@ -434,19 +435,18 @@ Internet-Draft               pNFS Metastripe                   July 2013
    LAYOUT4_NFSV4_1_FILES layout type, the client has a list network
    addresses to which to send requests.  With the LAYOUT4_NFSV4_1_FILES
    layout, the choice of the index in list of network addresses was
-   computed from the offset of the read or write request.  For dentry
-   striping layouts, the index counts from 0 to the dentry stripe count,
-   less 1.
+   computed from the offset of the read or write request.  For directory
+   striping layouts, the index counts from 0 to the directory stripe
+   count, less 1.
 
 
 
 
 
 
-
-Benjamin, et al.        Expires January 14, 2014                [Page 8]
+Benjamin, et al.          Expires July 17, 2014                 [Page 8]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
 5.  The Metadata Striping Layout
@@ -479,11 +479,11 @@ Internet-Draft               pNFS Metastripe                   July 2013
    The layout-type specific layouthint4 content for the LAYOUT4_METDATA
    layout type is composed of four fields, each optional.  Using some
    combination of the mdlh_min_est, mdlh_avg_est, and mdlh_max_est
-   fields, the client is enabled to give an indication of the dentry
-   workload it expects for a new directory inode.  The client also may
-   suggest an explicit stripe count or modulus preference in
-   mdlh_stripe_count or mdlh_stripe_modulus, which SHOULD be congruent
-   if specified together.
+   fields, the client is enabled to give an indication of the directory
+   workload it expects for a new directory.  The client also may suggest
+   an explicit stripe count or modulus preference in mdlh_stripe_count
+   or mdlh_stripe_modulus, which SHOULD be congruent if specified
+   together.
 
 5.3.2.  Devices
 
@@ -500,16 +500,16 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.        Expires January 14, 2014                [Page 9]
+Benjamin, et al.          Expires July 17, 2014                 [Page 9]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
 5.3.3.  Metadata Layout
 
    ///  enum md_layout_subtype4 {
-   ///     LAYOUTMETA4_INODE = 0,
-   ///     LAYOUTMETA4_DENTRY
+   ///     LAYOUTMETA4_FILEHANDLE = 0,
+   ///     LAYOUTMETA4_DIRECTORY
    ///  };
 
    ///
@@ -519,7 +519,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
    ///  };
    ///
 
-   ///  struct md_layout_dentry {
+   ///  struct md_layout_directory {
    ///     switch(uint32_t mdln_namebased_alg) {
    ///             case MDN_ALG_CITYHASH64:
    ///                     uint32_t seed;
@@ -532,10 +532,10 @@ Internet-Draft               pNFS Metastripe                   July 2013
    ///  struct md_layout4 {
    ///     union md_layout_type
    ///             switch (enum md_layout_subtype4 subtype) {
-   ///             case LAYOUTMETA4_INODE:
+   ///             case LAYOUTMETA4_FILEHANDLE:
    ///                     void;
-   ///             case LAYOUTMETA4_DENTRY:
-   ///                     md_layout_dentry mdl_layout;
+   ///             case LAYOUTMETA4_DIRECTORY:
+   ///                     md_layout_directory mdl_layout;
    ///     };
    ///  };
 
@@ -556,15 +556,15 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.        Expires January 14, 2014               [Page 10]
+Benjamin, et al.          Expires July 17, 2014                [Page 10]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
 5.3.4.  Layoutupdate4 lou_body
 
 ///
-///  struct md_dentry_layoutupdate4 {
+///  struct md_directory_layoutupdate4 {
 ///      int32_t mdlu_entries_added;
 ///      int32_t mdlu_entries_removed;
 ///      nfstime4 mdlu_last_update;
@@ -576,10 +576,10 @@ Internet-Draft               pNFS Metastripe                   July 2013
 ///  %  */
 ///  struct md_layout_update4 {
 ///      union md_layout_type switch (enum md_layout_subtype4 subtype) {
-///             case LAYOUTMETA4_INODE:
+///             case LAYOUTMETA4_FILEHANDLE:
 ///                     void;
-///             case LAYOUTMETA4_DENTRY:
-///                     md_layoutupdate4 mlu_dentry;
+///             case LAYOUTMETA4_DIRECTORY:
+///                     md_directory_layoutupdate4 mlu_directory;
 ///     };
 ///  };
 
@@ -595,42 +595,52 @@ Internet-Draft               pNFS Metastripe                   July 2013
 5.4.1.  LAYOUTGET Argument Conventions
 
    When a client requests a layout of type LAYOUT4_METADATA, it
-   specifies the desired subtype, which must be one of LAYOUTMETA4_INODE
-   or LAYOUTMETA4_DENTRY, as the value of the LAYOUTGET loga_iomode
-   argument.
+   specifies the desired subtype, which MUST be one of
+   LAYOUTMETA4_FILEHANDLE or LAYOUTMETA4_DIRECTORY, as the value of the
+   LAYOUTGET loga_iomode argument.  Server implementations should reject
+   LAYOUTGET requests with other values for loga_iomode.
 
-5.4.2.  Inode Striping Layouts
+   The value provided for loga_stateid may be any valid stateid for the
+   related file or directory, or else the anonymous stateid.
 
-   If the requested layout is of subtype LAYOUTMETA4_INODE, the value of
-   the layout is void.  The inode redirection information issued under
-   auspices of the layout will be entirely in the form of inode striping
-   attribute hints.
-
-   As noted in Section 4, the scope of inode striping layouts is an
-   entire file system.  The client can acquire the (singleton) inode
-   striping layout for a given file system using any corresponding file
+   The values provided for loga_offset, loga_length, and loga_minlength
+   are not defined for metastripe layouts, and server implementations
+   MUST NOT intepret these values.
 
 
 
-Benjamin, et al.        Expires January 14, 2014               [Page 11]
+
+
+
+Benjamin, et al.          Expires July 17, 2014                [Page 11]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
-   handle which it happens to hold, and whose object the client is
-   permitted to access.  For example, the client could use the file
-   handle of the first directory it traverses on a given file system,
-   provided the file server is an NFSv4.x file server that supports
-   layouts of type LAYOUT4_METADATA.
+5.4.2.  Filehandle Striping Layouts
 
-5.4.2.1.  Inode Stripe Hints
+   If the requested layout is of subtype LAYOUTMETA4_FILEHANDLE, the
+   value of the layout is void.  The filehandle redirection information
+   issued under auspices of the layout will be entirely in the form of
+   filehandle striping attribute hints.
 
-   Inode stripe hints are objects of type deviceid4, and are the value
-   of a new recommended, get-only attribute meta_stripe_deviceid.
+   As noted in Section 4, the scope of filehandle striping layouts is an
+   entire file system.  The client can acquire the (singleton)
+   filehandle striping layout for a given file system using any
+   corresponding file handle which it happens to hold, and whose object
+   the client is permitted to access.  For example, the client could use
+   the file handle of the first directory it traverses on a given file
+   system, provided the file server is an NFSv4.x file server that
+   supports layouts of type LAYOUT4_METADATA.
+
+5.4.2.1.  Filehandle Stripe Hints
+
+   Filehandle stripe hints are objects of type deviceid4, and are the
+   value of a new recommended, get-only attribute meta_stripe_deviceid.
 
    A client may successfully obtain the meta_stripe_deviceid attribute
-   on any file object if and only if it has successfully obtained an
-   inode striping layout on the containing file system.  Since the
+   on any file object if and only if it has successfully obtained a
+   filehandle striping layout on the containing file system.  Since the
    meta_stripe_deviceid hint is an ordinary NFSv4 attribute, the client
    may acquire it from a GETATTR, READDIR, or PREADDIR request.  A
    server implementation SHOULD interpret a PREADDIR operation (which
@@ -638,24 +648,32 @@ Internet-Draft               pNFS Metastripe                   July 2013
    those attributes that are appropriate for the layout stateid that has
    been presented.
 
-   At all events, when a client holds an inode stripe hint for a file
-   object, it uses the GETDEVICEINFO operation to map the hint value to
-   a to a device address of data type md_layout_addr4 in the ordinary
-   pNFS manner.
+   At all events, when a client holds a filehandle stripe hint for a
+   file object, it uses the GETDEVICEINFO operation to map the hint
+   value to a to a device address of data type md_layout_addr4 in the
+   ordinary pNFS manner.
 
    The server ensures that each such device remains accessible
-   (unrecalled) for at least as long as any inode striping layout exists
-   for which the device has been named in a hint.
+   (unrecalled) for at least as long as any filehandle striping layout
+   exists for which the device has been named in a hint.
 
-5.4.3.  Dentry Striping Layouts
+5.4.3.  Directory Striping Layouts
 
-   If the requested layout is of subtype LAYOUTMETA4_DENTRY, then the
+   If the requested layout is of subtype LAYOUTMETA4_DIRECTORY, then the
    layout contains a <device list, striping pattern, algorithm> triple
    enabling the client to perform both parallel directory enumeration
    operations and stripe-aware name-based operations, as outlined in
    Section 4.
 
-   When the layout subtype is LAYOUTMETA4_DENTRY, the layout content
+
+
+
+Benjamin, et al.          Expires July 17, 2014                [Page 12]
+
+Internet-Draft               pNFS Metastripe                January 2014
+
+
+   When the layout subtype is LAYOUTMETA4_DIRECTORY, the layout content
    provides an integer identifying a hashing algorithm, a list of
    deviceids, and a striping pattern.  Then mdln_namebased_alg
    identifies an algorithm that maps a name, as a component4, to an
@@ -665,14 +683,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    in the stripe pattern is an index into the device list.
 
    To perform a name based operation, the client maps the name to a
-
-
-
-Benjamin, et al.        Expires January 14, 2014               [Page 12]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
    number with the name based algorithm, looks that number up in the
    stripe pattern (modulo the length of the stripe pattern), yielding a
    device id that may be interpreted with GETDEVICEINFO, in the ordinary
@@ -682,10 +692,10 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 5.4.3.1.  L-MDS Selection for Name-based Operations
 
-   Clients with layouts of type LAYOUTMETA4_DENTRY may use the algorithm
-   supplied in field mdln_namebased_alg of the layout content to compute
-   a preferred L-MDS to use when performing name-based operations, as
-   follows:
+   Clients with layouts of type LAYOUTMETA4_DIRECTORY may use the
+   algorithm supplied in field mdln_namebased_alg of the layout content
+   to compute a preferred L-MDS to use when performing name-based
+   operations, as follows:
 
 Let F be the function specified in mdln_namebased_alg;
 
@@ -711,23 +721,21 @@ Let deviceid = mdl_layout.mdln_devicelist[idx];
    The current proposal defines a single algorithm, consisting of
    application of the 64-bit CityHash non-cryptographic hashing function
    [CITY], with x1 the desired component name, and x2 the 32-bit seed
+
+
+
+Benjamin, et al.          Expires July 17, 2014                [Page 13]
+
+Internet-Draft               pNFS Metastripe                January 2014
+
+
    value returned in the layout.
 
 5.4.3.2.  Directory Enumeration
 
-   Clients with layouts of type LAYOUTMETA4_DENTRY may use the following
-   algorithm to perform enumeration of striped directories preferred
-   metadata servers, in parallel:
-
-
-
-
-
-
-Benjamin, et al.        Expires January 14, 2014               [Page 13]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
+   Clients with layouts of type LAYOUTMETA4_DIRECTORY may use the
+   following algorithm to perform enumeration of striped directories
+   preferred metadata servers, in parallel:
 
    For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
            do
@@ -768,23 +776,25 @@ Internet-Draft               pNFS Metastripe                   July 2013
    that are valid cookies for the logical directory, but which are local
    to another L-MDS segment.
 
+
+
+
+
+Benjamin, et al.          Expires July 17, 2014                [Page 14]
+
+Internet-Draft               pNFS Metastripe                January 2014
+
+
 5.5.  LAYOUTCOMMIT
 
-   As inode striping layouts are effectively read-only, the layout
-   specific data for metastripe layouts of subtype LAYOUTMETA4_INODE is
-   void.
+   As filehandle striping layouts are effectively read-only, clients
+   SHOULD NOT attempt commits on filehandle striping layouts.  If a
+   server implementation receives a LAYOUTCOMMIT for a valid filehandle
+   striping layout, it SHOULD return NFS4ERR_OK.
 
-   For metastripe layouts of subtype LAYOUTMETA4_DENTRY, the layout
+   For metastripe layouts of subtype LAYOUTMETA4_DIRECTORY, the layout
    specific data for LAYOUTCOMMIT contains the signed count of items
    added to and removed from the directory since the last LAYOUTCOMMIT
-
-
-
-Benjamin, et al.        Expires January 14, 2014               [Page 14]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
    operation.
 
 
@@ -823,6 +833,14 @@ Internet-Draft               pNFS Metastripe                   July 2013
    layouts of type LAYOUT4_METADATA, the L-MDS MUST be aware of layout
    stateids issued by the controlling I-MDS in the corresponding layout.
 
+
+
+
+Benjamin, et al.          Expires July 17, 2014                [Page 15]
+
+Internet-Draft               pNFS Metastripe                January 2014
+
+
    In addition, the L-MDS MUST be aware of any non-layout stateids
    granted by the I-MDS, if and only if the client is in contact the
    L-MDS under direction of a metadata layout returned by the I-MDS, and
@@ -833,14 +851,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
    a metadata layout that directed the client to the L-MDS.
 
    In some cases, one L-MDS MUST be aware of a stateid generated by
-
-
-
-Benjamin, et al.        Expires January 14, 2014               [Page 15]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
    another L-MDS.  For example a client can obtain a stateid from the
    L-MDS serving as the destination of name-based operations, which
    includes OPEN.  However, operations that use the stateid will be
@@ -851,9 +861,14 @@ Internet-Draft               pNFS Metastripe                   July 2013
    When a client obtains a non-layout stateid from an L-MDS, for
    example, as the result of an OPEN operation, the stateid is asserted
    to be valid at the issuing L-MDS, and also the assocated I-MDS, as
-   noted above.  In addition, if the client holds an inode striping
+   noted above.  In addition, if the client holds a filehandle striping
    layout on the current file system, it SHOULD request the associated
    stripe hint on the object, ideally in the same COMPOUND.
+
+   When responding to client LAYOUTGET requests, server implementations
+   MUST accept the anonymous stateid as a valid stateid for both
+   LAYOUTMETA4_FILEHANDLE and LAYOUTMETA4_DIRECTORY layouts, but MAY
+   return NFS4ERR_BADSTATEID for other stateids, when appropriate.
 
 6.4.  Lease Terms
 
@@ -874,6 +889,14 @@ Internet-Draft               pNFS Metastripe                   July 2013
    component name would be combined to form a 32-bit stripe_unit_number.
    Once the client contacted the L-MDS, it would repeat the algorithm on
    the second four bytes of the component, and so on until the component
+
+
+
+Benjamin, et al.          Expires July 17, 2014                [Page 16]
+
+Internet-Draft               pNFS Metastripe                January 2014
+
+
    name was exhausted.
 
    More typically, an L-MDS MAY allow a LAYOUTGET operation of type
@@ -889,14 +912,6 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
    Metadata layouts do not present filehandles.
 
-
-
-
-Benjamin, et al.        Expires January 14, 2014               [Page 16]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
 6.7.  Restriping
 
 6.7.1.  Layout Recall Cases
@@ -906,14 +921,14 @@ Internet-Draft               pNFS Metastripe                   July 2013
    would be invalidated by the restriping.
 
    If the implementation wishes to restripe a directory on which there
-   are outstanding layouts of type LAYOUTMETA4_DENTRY, it must first
+   are outstanding layouts of type LAYOUTMETA4_DIRECTORY, it must first
    successfully recall these layouts at their controlling I-MDS servers,
    as described in [NFSv4.1].
 
-   If the implementation wishes to perform inode restriping which would
-   invalidate any inode stripe hint which it has issued to clients, it
-   MUST successfully recall all controlling layouts of type
-   LAYOUTMETA4_INODE which would conflict with the restriping.
+   If the implementation wishes to perform filehandle restriping which
+   would invalidate any filehandle stripe hint which it has issued to
+   clients, it MUST successfully recall all controlling layouts of type
+   LAYOUTMETA4_FILEHANDLE which would conflict with the restriping.
 
    Naturally, if a client requests an L-MDS to perform any operation
    under the auspices of a metadata layout which is no longer valid, the
@@ -922,12 +937,21 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 6.7.2.  Hint Invalidation
 
-   When an implementation wishes to perform inode restriping that would
-   invalidate an inode stripe hint or hints it has issued to clients, it
-   can use ordinary NFSv4.1 invalidation to reclaim the hints.  Since
-   inode stripe hints are recommended attributes, the controlling I-MDS
-   or L-MDS does this by updating the change attribute on the inode
-   being updated, as it would for any other inode update.
+   When an implementation wishes to perform filehandle restriping that
+   would invalidate an ilehandle stripe hint or hints it has issued to
+   clients, it can use ordinary NFSv4.1 invalidation to reclaim the
+   hints.  Since filehandle stripe hints are recommended attributes, the
+   controlling I-MDS or L-MDS does this by updating the change attribute
+   on the file being updated, as it would for any other file update.
+
+
+
+
+
+Benjamin, et al.          Expires July 17, 2014                [Page 17]
+
+Internet-Draft               pNFS Metastripe                January 2014
+
 
 6.8.  Recovery
 
@@ -943,23 +967,13 @@ Internet-Draft               pNFS Metastripe                   July 2013
    TBD
 
 
-
-
-
-
-
-Benjamin, et al.        Expires January 14, 2014               [Page 17]
-
-Internet-Draft               pNFS Metastripe                   July 2013
-
-
 7.  Negotiation
 
    The NFSv4.x client sends a GETATTR operation for attribute
    fs_layout_type.  If the reply contains the metadata layout type, then
-   either or both of inode or dentry striping are supported, subject to
-   further verification by subsequent LAYOUTGET operations.  If not, the
-   client cannot use metadata striping.
+   either or both of filehandle or directory striping are supported,
+   subject to further verification by subsequent LAYOUTGET operations.
+   If not, the client cannot use metadata striping.
 
 
 8.  Usage Examples
@@ -968,7 +982,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 8.1.  open-lock-write-close
 
-             I-MDS: LAYOUTGET for inode layout -> ino_stateid
+             I-MDS: LAYOUTGET for filehandle layout -> fh_stateid
              I-MDS: OPEN('foo') -> open_stateid
              I-MDS: GETATTR(meta_stripe_deviceid) -> in_deviceid
              I-MDS: GETDEVICEINFO(in_deviceid) -> [L-MDS]
@@ -976,8 +990,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
              L-MDS: LOCK(open_stateid) -> lock_stateid
              L-MDS: WRITE(lock_stateid)
              I-MDS: CLOSE(open_stateid)
-             I-MDS: LAYOUTRETURN(dn_stateid)
-             I-MDS: LAYOUTRETURN(ino_stateid)
+             I-MDS: LAYOUTRETURN(fh_stateid)
 
                                  Figure 7
 
@@ -991,51 +1004,38 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-Benjamin, et al.        Expires January 14, 2014               [Page 18]
+Benjamin, et al.          Expires July 17, 2014                [Page 18]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
 8.2.  parallel create-layoutcommit
 
-             I-MDS: LAYOUTGET for inode layout -> ino_stateid
-             I-MDS: LAYOUTGET(dir) for dentry layout
-               -> {dn_stateid, dn_deviceid, dn_placement}
-             I-MDS: GETDEVICEINFO(dn_deviceid)
+             I-MDS: LAYOUTGET for filehandle layout -> fh_stateid
+             I-MDS: LAYOUTGET(dir) for directory layout
+               -> {dir_stateid, dir_deviceid, dir_placement}
+             I-MDS: GETDEVICEINFO(dir_deviceid)
                -> [L-MDS1, L-MDS2, L-MDS3]
 
-             dn_placement('foo') -> L-MDS1
+             dir_placement('foo') -> L-MDS1
              L-MDS1: CREATE(dir, 'foo')
 
-             dn_placement('bar') -> L-MDS2
+             dir_placement('bar') -> L-MDS2
              L-MDS2: CREATE(dir, 'bar')
 
-             dn_placement('baz') -> L-MDS3
+             dir_placement('baz') -> L-MDS3
              L-MDS3: CREATE(dir, 'baz')
 
-             I-MDS: LAYOUTCOMMIT(dn_stateid, +3)
+             I-MDS: LAYOUTCOMMIT(dir_stateid, +3)
              I-MDS: LAYOUTRETURN(dn_stateid)
-             I-MDS: LAYOUTRETURN(ino_stateid)
+             I-MDS: LAYOUTRETURN(fh_stateid)
 
                                  Figure 8
 
 8.3.  parallel directory listing
 
-             I-MDS: LAYOUTGET for inode layout -> ino_stateid
-             I-MDS: LAYOUTGET(dir) for dentry layout
+             I-MDS: LAYOUTGET for filehandle layout -> fh_stateid
+             I-MDS: LAYOUTGET(dir) for directory layout
                -> dn_stateid, dn_deviceid
              I-MDS: GETDEVICEINFO(dn_deviceid)
                -> [L-MDS1, L-MDS2, L-MDS3]
@@ -1048,7 +1048,7 @@ Internet-Draft               pNFS Metastripe                   July 2013
                -> [g, h, i]
 
              I-MDS: LAYOUTRETURN(dn_stateid)
-             I-MDS: LAYOUTRETURN(ino_stateid)
+             I-MDS: LAYOUTRETURN(fh_stateid)
 
                                  Figure 9
 
@@ -1060,9 +1060,9 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.        Expires January 14, 2014               [Page 19]
+Benjamin, et al.          Expires July 17, 2014                [Page 19]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
    filehandles.
@@ -1116,9 +1116,9 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.        Expires January 14, 2014               [Page 20]
+Benjamin, et al.          Expires July 17, 2014                [Page 20]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
    This specification introduces a new operation (PREADDIR).
@@ -1172,9 +1172,9 @@ Authors' Addresses
 
 
 
-Benjamin, et al.        Expires January 14, 2014               [Page 21]
+Benjamin, et al.          Expires July 17, 2014                [Page 21]
 
-Internet-Draft               pNFS Metastripe                   July 2013
+Internet-Draft               pNFS Metastripe                January 2014
 
 
    Casey Bodley
@@ -1228,5 +1228,5 @@ Internet-Draft               pNFS Metastripe                   July 2013
 
 
 
-Benjamin, et al.        Expires January 14, 2014               [Page 22]
+Benjamin, et al.          Expires July 17, 2014                [Page 22]
 
