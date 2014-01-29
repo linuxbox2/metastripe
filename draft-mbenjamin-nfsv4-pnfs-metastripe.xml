@@ -503,7 +503,7 @@
           </figure>
 	  <t>
 	    The layout-type specific layouthint4 content for the
-	    LAYOUT4_METDATA layout type is composed of four fields,
+	    LAYOUT4_METDATA layout type is composed of five fields,
 	    each optional.  Using some combination of the
 	    mdlh_min_est, mdlh_avg_est, and mdlh_max_est fields, the
 	    client is enabled to give an indication of the directory
