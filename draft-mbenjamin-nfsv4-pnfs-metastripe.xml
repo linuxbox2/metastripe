@@ -813,6 +813,36 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
 	  operation.
 	</t>
       </section>
+
+      <section anchor="PREADDIR" title="Operation: PREADDIR - Parallel Read Directory">
+        <section title="ARGUMENTS">
+	  <figure align="left" anchor="fig_PREADDIR4args">
+            <artwork><![CDATA[
+///  struct READDIR4args {
+///          /* CURRENT_FH: directory */
+///          nfs_cookie4     cookie;
+///          verifier4       cookieverf;
+///          count4          dircount;
+///          count4          maxcount;
+///          bitmap4         attr_request;
+///          stateid4        layout_stateid;
+///          uint32_t        stripe_number;
+///  };
+]]></artwork>
+          </figure>
+        </section>
+        <section title="RESULTS">
+	  <figure align="left" anchor="fig_PREADDIR4res">
+            <artwork><![CDATA[
+///  typedef struct READDIR4res PREADDIR4res;
+]]></artwork>
+          </figure>
+        </section>
+        <section title="DESCRIPTION">
+        </section>
+        <section title="IMPLEMENTATION">
+        </section>
+      </section>
     </section>
 
     <section anchor="FurtherConsiderations" title="Further
