@@ -810,6 +810,24 @@ Let deviceid = mdl_layout.mdln_devicelist[idx];
 		  fragments contains the hash value 'v'.  Assign this child
 		  fragment to 'f' and continue.
 	      </t>
+	      <section anchor="SDSNamebasedCephLinux" title="MDC_HASH_LINUX_DCACHE">
+		<t>
+		  Specifies the use of the Linux dentry cache (needs reference)
+		  hashing function.
+		</t>
+	      </section>
+	      <section anchor="SDSNamebasedCephJenkins" title="MDC_HASH_RJENKINS">
+		<t>
+		  Specifies the use of Robert Jenkins' <xref target="JENKINS"/>
+		  hashing function.
+		</t>
+	      </section>
+	      <section anchor="SDSNamebasedCephCity" title="MDC_HASH_CITYHASH32">
+		<t>
+		  Specifies the use of the 32-bit CityHash <xref target="CITY"/>
+		  hashing function.
+		</t>
+	      </section>
 	    </section>
 	  </section>
 	  <section anchor="SDSDirectoryEnum" title="Directory
@@ -1311,6 +1329,18 @@ For stripe_number in 0 .. length(mdl_layout.mdln_stripe_pattern) -1
           <date year="2011" month="April" day="11"/>
         </front>
       </reference>
+
+      <reference anchor="JENKINS"
+		 target="http://burtleburtle.net/bob/hash/evahash.html">
+        <front>
+          <title>Hash Functions for Hash Table Lookup</title>
+
+          <author surname="Jenkins" fullname="Robert J. Jenkins Jr.">
+            <organization>Google</organization>
+          </author>
+        </front>
+      </reference>
+
     </references>
 
     <references title="Informative References">
