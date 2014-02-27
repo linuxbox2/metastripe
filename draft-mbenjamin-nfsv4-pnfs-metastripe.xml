@@ -537,18 +537,39 @@
 ///
 ///  enum md_namebased_alg4 {
 ///     MDN_ALG_CITYHASH64 = 0,
+///     MDN_ALG_CEPHFRAG = 1,
 ///     /* XXX TBD2 */
 ///  };
 ///
 
+///  typedef uint32_t cephfrag4;
+///
+///  struct cephfragsplit4 {
+///     cephfrag4 frag;
+///     uint32_t bits;
+///  };
+///
+///  enum cephhash4 {
+///     MDC_HASH_LINUX_DCACHE = 0,
+///     MDC_HASH_RJENKINS = 1,
+///     MDC_HASH_CITYHASH32 = 2,
+///  };
+///
+///  struct md_namebased_alg_cephfrag4 {
+///     enum cephhash4 hash;
+///     cephfragsplit4 fragtree<>;
+///  };
+
 ///  struct md_layout_directory {
-///     switch(uint32_t mdln_namebased_alg) {
+///     switch(enum md_namebased_alg4 mdln_namebased_alg) {
 ///             case MDN_ALG_CITYHASH64:
-///                     uint32_t seed;
+///                     uint32_t mdln_cityhash_seed;
+///             case MDN_ALG_CEPHFRAG:
+///                     md_namebased_alg_cephfrag4 mdln_cephfrag;
 ///     };
 ///
 ///     deviceid4 mdln_devicelist<>;
-///     uint32_t    mdln_stripe_pattern<>;
+///     uint32_t mdln_stripe_pattern<>;
 ///  };
 
 ///  struct md_layout4 {
@@ -740,13 +761,56 @@ Let deviceid = mdl_layout.mdln_devicelist[idx];
 	  (using GETDEVICEINFO in the normal manner), and sends the
 	  name-based operation to that server.
 	</t>
-	<t>
-	  The current proposal defines a single algorithm, consisting
-	  of application of the 64-bit CityHash non-cryptographic
-	  hashing function  <xref target="CITY"/>, with x1 the desired
-	  component name, and x2 the 32-bit seed value returned in the
-	  layout.
-	    </t>
+	    <section anchor="SDSNamebasedCity" title="MDN_ALG_CITYHASH64">
+	      <t>
+		A layout with MDN_ALG_CITYHASH64 as the mdln_namebased_alg
+		indicates the use of the 64-bit CityHash non-cryptographic
+		hashing function <xref target="CITY"/> for directory
+		placement, with x1 the desired component name, and x2 the
+		32-bit seed value returned in the layout.
+	      </t>
+	    </section>
+	    <section anchor="SDSNamebasedCeph" title="MDN_ALG_CEPHFRAG">
+	      <t>
+		A layout with MDN_ALG_CEPHFRAG as the mdln_namebased_alg
+		indicates the use of Ceph's directory fragmentation
+		algorithm for directory placement.
+	      </t>
+	      <t>
+		Ceph uses a recursive algorithm to partition the hash space
+		of a directory into fragments, which are represented by an
+	       	an ordered list of splits called the fragtree.  Fragments
+		are split into powers of two, so each split stores this
+	       	exponent in the field 'bits'.
+	      </t>
+	      <t>
+		Similarly, the cephfrag4 encodes in its high 8 bits the total
+		number of bits 'n' it has split from the root fragment.  In the
+		next highest 'n' bits, it encodes its position in the hash
+		space.  If a given hash value 'v' matches these 'n' bits, the
+		fragment is said to contain 'v'.
+	      </t>
+	      <t>
+		For example, starting with the root fragment root=0x00000000
+		and splitting by 2 bits, we generate the four fragments
+		f1=0x02000000, f2=0x02400000, f3=0x02800000 and
+		f4=0x02C00000.  Further splitting f3 by 1 bit, we generate
+		two new fragments g1=0x03800000 and g2=0x03A00000.  The
+		resulting fragtree for this structure would be
+		{ {0x00000000, 2}, {0x02800000, 1} }.
+	      </t>
+	      <t>
+		To place a given filename, calculate its hash value 'v'
+		using the hash function indicated by the 'hash' enum.  Then,
+		starting with the root fragment f=0x00000000, follow these
+		step recursively:
+		* Search for a split in the fragtree matching frag=f.  If no
+		  split is found, place the file in fragment f.
+		* Given a split of 'n' bits, find which of the 2^n child
+		  fragments contains the hash value 'v'.  Assign this child
+		  fragment to 'f' and continue.
+	      </t>
+	    </section>
 	  </section>
 	  <section anchor="SDSDirectoryEnum" title="Directory
 						    Enumeration">
