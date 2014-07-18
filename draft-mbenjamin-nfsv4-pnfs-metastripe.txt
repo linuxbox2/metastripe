@@ -4,16 +4,16 @@
 NFSv4                                                        M. Benjamin
 Internet-Draft                                             CohortFS, LLC
 Intended status: Standards Track                                  Bodley
-Expires: July 17, 2014                                           Emerson
+Expires: January 19, 2015                                        Emerson
 
                                                                   Ersani
                                                                   NetApp
                                                                 Honeyman
-                                                        January 13, 2014
+                                                           July 18, 2014
 
 
                          pNFS Metadata Striping
-                draft-mbenjamin-nfsv4-pnfs-metastripe-02
+                draft-mbenjamin-nfsv4-pnfs-metastripe-03
 
 Abstract
 
@@ -45,16 +45,16 @@ Status of this Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on July 17, 2014.
+   This Internet-Draft will expire on January 19, 2015.
 
 Copyright Notice
 
 
 
 
-Benjamin, et al.          Expires July 17, 2014                 [Page 1]
+Benjamin, et al.        Expires January 19, 2015                [Page 1]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
    Copyright (c) 2014 IETF Trust and the persons identified as the
@@ -103,52 +103,49 @@ Table of Contents
        5.4.1.  LAYOUTGET Argument Conventions . . . . . . . . . . . . 11
        5.4.2.  Filehandle Striping Layouts  . . . . . . . . . . . . . 12
          5.4.2.1.  Filehandle Stripe Hints  . . . . . . . . . . . . . 12
-       5.4.3.  Directory Striping Layouts . . . . . . . . . . . . . . 12
+       5.4.3.  Directory Striping Layouts . . . . . . . . . . . . . . 13
          5.4.3.1.  L-MDS Selection for Name-based Operations  . . . . 13
 
 
 
-Benjamin, et al.          Expires July 17, 2014                 [Page 2]
+Benjamin, et al.        Expires January 19, 2015                [Page 2]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
-         5.4.3.2.  Directory Enumeration  . . . . . . . . . . . . . . 14
-     5.5.  LAYOUTCOMMIT . . . . . . . . . . . . . . . . . . . . . . . 15
-   6.  Further Considerations . . . . . . . . . . . . . . . . . . . . 15
-     6.1.  Storage Access Protocols . . . . . . . . . . . . . . . . . 15
-     6.2.  Revocation of Layouts  . . . . . . . . . . . . . . . . . . 15
-     6.3.  Stateids . . . . . . . . . . . . . . . . . . . . . . . . . 15
-     6.4.  Lease Terms  . . . . . . . . . . . . . . . . . . . . . . . 16
-     6.5.  Layout Operations Sent to an L-MDS . . . . . . . . . . . . 16
-     6.6.  Filehandles in Metadata Layouts  . . . . . . . . . . . . . 17
-     6.7.  Restriping . . . . . . . . . . . . . . . . . . . . . . . . 17
-       6.7.1.  Layout Recall Cases  . . . . . . . . . . . . . . . . . 17
-       6.7.2.  Hint Invalidation  . . . . . . . . . . . . . . . . . . 17
-     6.8.  Recovery . . . . . . . . . . . . . . . . . . . . . . . . . 18
-     6.9.  Failure and Restart of Client  . . . . . . . . . . . . . . 18
-     6.10. Failure and Restart of Server  . . . . . . . . . . . . . . 18
-   7.  Negotiation  . . . . . . . . . . . . . . . . . . . . . . . . . 18
-   8.  Usage Examples . . . . . . . . . . . . . . . . . . . . . . . . 18
-     8.1.  open-lock-write-close  . . . . . . . . . . . . . . . . . . 18
-     8.2.  parallel create-layoutcommit . . . . . . . . . . . . . . . 19
-     8.3.  parallel directory listing . . . . . . . . . . . . . . . . 19
-   9.  Operational Recommendation for Deployment  . . . . . . . . . . 19
-   10. Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 20
-   11. Security Considerations  . . . . . . . . . . . . . . . . . . . 20
-   12. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 20
-   13. References . . . . . . . . . . . . . . . . . . . . . . . . . . 21
-     13.1. Normative References . . . . . . . . . . . . . . . . . . . 21
-     13.2. Informative References . . . . . . . . . . . . . . . . . . 21
-   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 21
-
-
-
-
-
-
-
-
+         5.4.3.2.  Directory Enumeration  . . . . . . . . . . . . . . 15
+     5.5.  LAYOUTCOMMIT . . . . . . . . . . . . . . . . . . . . . . . 16
+     5.6.  Operation: PREADDIR - Parallel Read Directory  . . . . . . 16
+       5.6.1.  ARGUMENTS  . . . . . . . . . . . . . . . . . . . . . . 16
+       5.6.2.  RESULTS  . . . . . . . . . . . . . . . . . . . . . . . 16
+       5.6.3.  DESCRIPTION  . . . . . . . . . . . . . . . . . . . . . 16
+       5.6.4.  IMPLEMENTATION . . . . . . . . . . . . . . . . . . . . 16
+   6.  Further Considerations . . . . . . . . . . . . . . . . . . . . 16
+     6.1.  Storage Access Protocols . . . . . . . . . . . . . . . . . 17
+     6.2.  Revocation of Layouts  . . . . . . . . . . . . . . . . . . 17
+     6.3.  Stateids . . . . . . . . . . . . . . . . . . . . . . . . . 17
+     6.4.  Lease Terms  . . . . . . . . . . . . . . . . . . . . . . . 18
+     6.5.  Layout Operations Sent to an L-MDS . . . . . . . . . . . . 18
+     6.6.  Filehandles in Metadata Layouts  . . . . . . . . . . . . . 18
+     6.7.  Restriping . . . . . . . . . . . . . . . . . . . . . . . . 19
+       6.7.1.  Layout Recall Cases  . . . . . . . . . . . . . . . . . 19
+       6.7.2.  Hint Invalidation  . . . . . . . . . . . . . . . . . . 19
+     6.8.  Recovery . . . . . . . . . . . . . . . . . . . . . . . . . 19
+     6.9.  Failure and Restart of Client  . . . . . . . . . . . . . . 19
+     6.10. Failure and Restart of Server  . . . . . . . . . . . . . . 19
+   7.  Negotiation  . . . . . . . . . . . . . . . . . . . . . . . . . 20
+   8.  Usage Examples . . . . . . . . . . . . . . . . . . . . . . . . 20
+     8.1.  open-lock-write-close  . . . . . . . . . . . . . . . . . . 20
+     8.2.  parallel create-layoutcommit . . . . . . . . . . . . . . . 20
+     8.3.  parallel directory listing . . . . . . . . . . . . . . . . 21
+   9.  Operational Recommendation for Deployment  . . . . . . . . . . 21
+   10. Acknowledgements . . . . . . . . . . . . . . . . . . . . . . . 21
+   11. Security Considerations  . . . . . . . . . . . . . . . . . . . 21
+   12. IANA Considerations  . . . . . . . . . . . . . . . . . . . . . 22
+   13. References . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+     13.1. Normative References . . . . . . . . . . . . . . . . . . . 22
+     13.2. Informative References . . . . . . . . . . . . . . . . . . 23
+   Authors' Addresses . . . . . . . . . . . . . . . . . . . . . . . . 23
 
 
 
@@ -164,9 +161,12 @@ Internet-Draft               pNFS Metastripe                January 2014
 
 
 
-Benjamin, et al.          Expires July 17, 2014                 [Page 3]
+
+
+
+Benjamin, et al.        Expires January 19, 2015                [Page 3]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
 1.  Introduction and Motivation
@@ -220,9 +220,9 @@ Internet-Draft               pNFS Metastripe                January 2014
 
 
 
-Benjamin, et al.          Expires July 17, 2014                 [Page 4]
+Benjamin, et al.        Expires January 19, 2015                [Page 4]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
 2.4.  Cookie Model
@@ -276,9 +276,9 @@ Internet-Draft               pNFS Metastripe                January 2014
 
 
 
-Benjamin, et al.          Expires July 17, 2014                 [Page 5]
+Benjamin, et al.        Expires January 19, 2015                [Page 5]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
 3.  Terminology
@@ -332,9 +332,9 @@ Internet-Draft               pNFS Metastripe                January 2014
 
 
 
-Benjamin, et al.          Expires July 17, 2014                 [Page 6]
+Benjamin, et al.        Expires January 19, 2015                [Page 6]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
       Directory-enumeration.  These are operations that take one
@@ -388,9 +388,9 @@ Internet-Draft               pNFS Metastripe                January 2014
 
 
 
-Benjamin, et al.          Expires July 17, 2014                 [Page 7]
+Benjamin, et al.        Expires January 19, 2015                [Page 7]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
    client first obtains a metadata layout of subtype
@@ -444,9 +444,9 @@ Internet-Draft               pNFS Metastripe                January 2014
 
 
 
-Benjamin, et al.          Expires July 17, 2014                 [Page 8]
+Benjamin, et al.        Expires January 19, 2015                [Page 8]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
 5.  The Metadata Striping Layout
@@ -477,7 +477,7 @@ Internet-Draft               pNFS Metastripe                January 2014
                                  Figure 1
 
    The layout-type specific layouthint4 content for the LAYOUT4_METDATA
-   layout type is composed of four fields, each optional.  Using some
+   layout type is composed of five fields, each optional.  Using some
    combination of the mdlh_min_est, mdlh_avg_est, and mdlh_max_est
    fields, the client is enabled to give an indication of the directory
    workload it expects for a new directory.  The client also may suggest
@@ -500,9 +500,9 @@ Internet-Draft               pNFS Metastripe                January 2014
 
 
 
-Benjamin, et al.          Expires July 17, 2014                 [Page 9]
+Benjamin, et al.        Expires January 19, 2015                [Page 9]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
 5.3.3.  Metadata Layout
@@ -515,23 +515,52 @@ Internet-Draft               pNFS Metastripe                January 2014
    ///
    ///  enum md_namebased_alg4 {
    ///     MDN_ALG_CITYHASH64 = 0,
+   ///     MDN_ALG_CEPHFRAG = 1,
    ///     /* XXX TBD2 */
    ///  };
    ///
 
+   ///  typedef uint32_t cephfrag4;
+   ///
+   ///  struct cephfragsplit4 {
+   ///     cephfrag4 frag;
+   ///     uint32_t bits;
+   ///  };
+   ///
+   ///  enum cephhash4 {
+   ///     MDC_HASH_LINUX_DCACHE = 0,
+   ///     MDC_HASH_RJENKINS = 1,
+   ///     MDC_HASH_CITYHASH32 = 2,
+   ///  };
+   ///
+   ///  struct md_namebased_alg_cephfrag4 {
+   ///     enum cephhash4 hash;
+   ///     cephfragsplit4 fragtree<>;
+   ///  };
+
    ///  struct md_layout_directory {
-   ///     switch(uint32_t mdln_namebased_alg) {
+   ///     switch(enum md_namebased_alg4 mdln_namebased_alg) {
    ///             case MDN_ALG_CITYHASH64:
-   ///                     uint32_t seed;
+   ///                     uint32_t mdln_cityhash_seed;
+   ///             case MDN_ALG_CEPHFRAG:
+   ///                     md_namebased_alg_cephfrag4 mdln_cephfrag;
    ///     };
    ///
    ///     deviceid4 mdln_devicelist<>;
-   ///     uint32_t    mdln_stripe_pattern<>;
+   ///     uint32_t mdln_stripe_pattern<>;
    ///  };
 
    ///  struct md_layout4 {
    ///     union md_layout_type
    ///             switch (enum md_layout_subtype4 subtype) {
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 10]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
+
    ///             case LAYOUTMETA4_FILEHANDLE:
    ///                     void;
    ///             case LAYOUTMETA4_DIRECTORY:
@@ -540,26 +569,6 @@ Internet-Draft               pNFS Metastripe                January 2014
    ///  };
 
                                  Figure 3
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 10]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
 
 5.3.4.  Layoutupdate4 lou_body
 
@@ -600,22 +609,20 @@ Internet-Draft               pNFS Metastripe                January 2014
    LAYOUTGET loga_iomode argument.  Server implementations should reject
    LAYOUTGET requests with other values for loga_iomode.
 
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 11]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
+
    The value provided for loga_stateid may be any valid stateid for the
    related file or directory, or else the anonymous stateid.
 
    The values provided for loga_offset, loga_length, and loga_minlength
    are not defined for metastripe layouts, and server implementations
    MUST NOT intepret these values.
-
-
-
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 11]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
 
 5.4.2.  Filehandle Striping Layouts
 
@@ -657,6 +664,15 @@ Internet-Draft               pNFS Metastripe                January 2014
    (unrecalled) for at least as long as any filehandle striping layout
    exists for which the device has been named in a hint.
 
+
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 12]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
+
 5.4.3.  Directory Striping Layouts
 
    If the requested layout is of subtype LAYOUTMETA4_DIRECTORY, then the
@@ -664,14 +680,6 @@ Internet-Draft               pNFS Metastripe                January 2014
    enabling the client to perform both parallel directory enumeration
    operations and stripe-aware name-based operations, as outlined in
    Section 4.
-
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 12]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
 
    When the layout subtype is LAYOUTMETA4_DIRECTORY, the layout content
    provides an integer identifying a hashing algorithm, a list of
@@ -714,22 +722,76 @@ Let deviceid = mdl_layout.mdln_devicelist[idx];
 
                                  Figure 5
 
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 13]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
+
    The client then selects an L-MDS indicated by the deviceid (using
    GETDEVICEINFO in the normal manner), and sends the name-based
    operation to that server.
 
-   The current proposal defines a single algorithm, consisting of
-   application of the 64-bit CityHash non-cryptographic hashing function
-   [CITY], with x1 the desired component name, and x2 the 32-bit seed
+5.4.3.1.1.  MDN_ALG_CITYHASH64
+
+   A layout with MDN_ALG_CITYHASH64 as the mdln_namebased_alg indicates
+   the use of the 64-bit CityHash non-cryptographic hashing function
+   [CITY] for directory placement, with x1 the desired component name,
+   and x2 the 32-bit seed value returned in the layout.
+
+5.4.3.1.2.  MDN_ALG_CEPHFRAG
+
+   A layout with MDN_ALG_CEPHFRAG as the mdln_namebased_alg indicates
+   the use of Ceph's directory fragmentation algorithm for directory
+   placement.
+
+   Ceph uses a recursive algorithm to partition the hash space of a
+   directory into fragments, which are represented by an an ordered list
+   of splits called the fragtree.  Fragments are split into powers of
+   two, so each split stores this exponent in the field 'bits'.
+
+   Similarly, the cephfrag4 encodes in its high 8 bits the total number
+   of bits 'n' it has split from the root fragment.  In the next highest
+   'n' bits, it encodes its position in the hash space.  If a given hash
+   value 'v' matches these 'n' bits, the fragment is said to contain
+   'v'.
+
+   For example, starting with the root fragment root=0x00000000 and
+   splitting by 2 bits, we generate the four fragments f1=0x02000000,
+   f2=0x02400000, f3=0x02800000 and f4=0x02C00000.  Further splitting f3
+   by 1 bit, we generate two new fragments g1=0x03800000 and
+   g2=0x03A00000.  The resulting fragtree for this structure would be {
+   {0x00000000, 2}, {0x02800000, 1} }.
+
+   To place a given filename, calculate its hash value 'v' using the
+   hash function indicated by the 'hash' enum.  Then, starting with the
+   root fragment f=0x00000000, follow these step recursively: * Search
+   for a split in the fragtree matching frag=f.  If no split is found,
+   place the file in fragment f. * Given a split of 'n' bits, find which
+   of the 2^n child fragments contains the hash value 'v'.  Assign this
+   child fragment to 'f' and continue.
+
+5.4.3.1.2.1.  MDC_HASH_LINUX_DCACHE
+
+   Specifies the use of the Linux dentry cache (needs reference) hashing
+   function.
 
 
 
-Benjamin, et al.          Expires July 17, 2014                [Page 13]
+
+Benjamin, et al.        Expires January 19, 2015               [Page 14]
 
-Internet-Draft               pNFS Metastripe                January 2014
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
-   value returned in the layout.
+5.4.3.1.2.2.  MDC_HASH_RJENKINS
+
+   Specifies the use of Robert Jenkins' [JENKINS] hashing function.
+
+5.4.3.1.2.3.  MDC_HASH_CITYHASH32
+
+   Specifies the use of the 32-bit CityHash [CITY] hashing function.
 
 5.4.3.2.  Directory Enumeration
 
@@ -771,19 +833,18 @@ Internet-Draft               pNFS Metastripe                January 2014
    are exactly as in ordinary NFSv4.1, except with respect to entry and
    cookie partitioning as described here.  The client SHOULD present to
    a component L-MDS only cookie values previously returned to that
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 15]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
+
    client by that same L-MDS, or 0 to commence iteration.  An L-MDS MAY
    reject with NFS4ERR_BADCOOKIE PREADDIR operations using cookie values
    that are valid cookies for the logical directory, but which are local
    to another L-MDS segment.
-
-
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 14]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
 
 5.5.  LAYOUTCOMMIT
 
@@ -797,8 +858,44 @@ Internet-Draft               pNFS Metastripe                January 2014
    added to and removed from the directory since the last LAYOUTCOMMIT
    operation.
 
+5.6.  Operation: PREADDIR - Parallel Read Directory
+
+5.6.1.  ARGUMENTS
+
+   ///  struct READDIR4args {
+   ///          /* CURRENT_FH: directory */
+   ///          nfs_cookie4     cookie;
+   ///          verifier4       cookieverf;
+   ///          count4          dircount;
+   ///          count4          maxcount;
+   ///          bitmap4         attr_request;
+   ///          stateid4        layout_stateid;
+   ///          uint32_t        stripe_number;
+   ///  };
+
+                                 Figure 7
+
+5.6.2.  RESULTS
+
+   ///  typedef struct READDIR4res PREADDIR4res;
+
+                                 Figure 8
+
+5.6.3.  DESCRIPTION
+
+5.6.4.  IMPLEMENTATION
+
 
 6.  Further Considerations
+
+
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 16]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
 
 6.1.  Storage Access Protocols
 
@@ -833,14 +930,6 @@ Internet-Draft               pNFS Metastripe                January 2014
    layouts of type LAYOUT4_METADATA, the L-MDS MUST be aware of layout
    stateids issued by the controlling I-MDS in the corresponding layout.
 
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 15]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
-
    In addition, the L-MDS MUST be aware of any non-layout stateids
    granted by the I-MDS, if and only if the client is in contact the
    L-MDS under direction of a metadata layout returned by the I-MDS, and
@@ -856,6 +945,14 @@ Internet-Draft               pNFS Metastripe                January 2014
    includes OPEN.  However, operations that use the stateid will be
    filehandle-only operations, and the L-MDS the OPEN operation is sent
    to might differ from the L-MDS the LOCK operation for the same target
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 17]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
+
    file is sent to.
 
    When a client obtains a non-layout stateid from an L-MDS, for
@@ -889,14 +986,6 @@ Internet-Draft               pNFS Metastripe                January 2014
    component name would be combined to form a 32-bit stripe_unit_number.
    Once the client contacted the L-MDS, it would repeat the algorithm on
    the second four bytes of the component, and so on until the component
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 16]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
-
    name was exhausted.
 
    More typically, an L-MDS MAY allow a LAYOUTGET operation of type
@@ -911,6 +1000,14 @@ Internet-Draft               pNFS Metastripe                January 2014
 6.6.  Filehandles in Metadata Layouts
 
    Metadata layouts do not present filehandles.
+
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 18]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
 
 6.7.  Restriping
 
@@ -944,15 +1041,6 @@ Internet-Draft               pNFS Metastripe                January 2014
    controlling I-MDS or L-MDS does this by updating the change attribute
    on the file being updated, as it would for any other file update.
 
-
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 17]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
-
 6.8.  Recovery
 
    [[Comment.1: it is likely this section will follow that of the files
@@ -965,6 +1053,16 @@ Internet-Draft               pNFS Metastripe                January 2014
 6.10.  Failure and Restart of Server
 
    TBD
+
+
+
+
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 19]
+
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
 7.  Negotiation
@@ -992,22 +1090,7 @@ Internet-Draft               pNFS Metastripe                January 2014
              I-MDS: CLOSE(open_stateid)
              I-MDS: LAYOUTRETURN(fh_stateid)
 
-                                 Figure 7
-
-
-
-
-
-
-
-
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 18]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
+                                 Figure 9
 
 8.2.  parallel create-layoutcommit
 
@@ -1030,7 +1113,15 @@ Internet-Draft               pNFS Metastripe                January 2014
              I-MDS: LAYOUTRETURN(dn_stateid)
              I-MDS: LAYOUTRETURN(fh_stateid)
 
-                                 Figure 8
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 20]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
+
+                                 Figure 10
 
 8.3.  parallel directory listing
 
@@ -1050,21 +1141,13 @@ Internet-Draft               pNFS Metastripe                January 2014
              I-MDS: LAYOUTRETURN(dn_stateid)
              I-MDS: LAYOUTRETURN(fh_stateid)
 
-                                 Figure 9
+                                 Figure 11
 
 
 9.  Operational Recommendation for Deployment
 
    Deploy the metadata striping layout when it is anticipated that the
    workload will involve a high fraction of non-I/O operations on
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 19]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
-
    filehandles.
 
 
@@ -1086,6 +1169,12 @@ Internet-Draft               pNFS Metastripe                January 2014
    server and client are, respectively, a complete NFSv4.1 server and
    client, and so the security considerations of [NFSv4.1] apply to any
    client or server using the metadata layout type.
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 21]
+
+Internet-Draft               pNFS Metastripe                   July 2014
 
 
 12.  IANA Considerations
@@ -1113,14 +1202,6 @@ Internet-Draft               pNFS Metastripe                January 2014
    This specification introduces two new recommended attributes
    (meta_stripe_deviceid and meta_stripe_count).
 
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 20]
-
-Internet-Draft               pNFS Metastripe                January 2014
-
-
    This specification introduces a new operation (PREADDIR).
 
 
@@ -1132,14 +1213,25 @@ Internet-Draft               pNFS Metastripe                January 2014
               http://google-opensource.blogspot.com/2011/04/
               introducing-cityhash.html>.
 
+   [JENKINS]  Jenkins, "Hash Functions for Hash Table Lookup",
+              <http://burtleburtle.net/bob/hash/evahash.html>.
+
    [METASTRIPE]
               Eisler, "Metadata Striping for pNFS", October 2010, <http:
               //tools.ietf.org/html/
-              draft-eisler-nfsv4-pnfs-metastripe-02>.
+              draft-eisler-nfsv4-pnfs-metastripe-03>.
 
    [NFSv4.1]  Shepler, Eisler, and Noveck, "Network File System (NFS)
               Version 4 Minor Version 1 Protocol", January 2010,
               <http://tools.ietf.org/html/rfc5661>.
+
+
+
+
+Benjamin, et al.        Expires January 19, 2015               [Page 22]
+
+Internet-Draft               pNFS Metastripe                   July 2014
+
 
    [RFC2119]  Bradner, S., "Key words for use in RFCs to Indicate
               Requirement Levels", BCP 14, RFC 2119, March 1997.
@@ -1164,17 +1256,6 @@ Authors' Addresses
 
    Phone: +1 734 761 4689
    Email: matt@cohortfs.com
-
-
-
-
-
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 21]
-
-Internet-Draft               pNFS Metastripe                January 2014
 
 
    Casey Bodley
@@ -1203,30 +1284,5 @@ Internet-Draft               pNFS Metastripe                January 2014
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Benjamin, et al.          Expires July 17, 2014                [Page 22]
+Benjamin, et al.        Expires January 19, 2015               [Page 23]
 
